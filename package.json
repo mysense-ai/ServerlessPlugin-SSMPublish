@@ -44,7 +44,7 @@
   ],
   "scripts": {
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:build": "jest -c '{}' build",
     "test:coverage": "jest --coverage",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
