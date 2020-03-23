@@ -61,7 +61,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.31",
     "@types/jest": "^24.0.17",
-    "@types/node": "^12.7.1",
+    "@types/node": "^13.9.3",
     "@types/serverless": "^1.18.2",
     "aws-sdk": "^2.512.0",
     "aws-sdk-mock": "^4.5.0",
