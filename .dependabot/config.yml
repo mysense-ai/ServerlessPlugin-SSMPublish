@@ -5,16 +5,11 @@ update_configs:
   # Keep package.json (& lockfiles) up to date as soon as new versions are published to the npm registry
   - package_manager: 'javascript'                             # What package manager to use
     directory: '/'                                            # Where to look for package manifests (package.json)
-    update_schedule: 'live'                                   # How often to check for updates (live, daily, weekly, monthly)
-    target_branch: 'develop'                                  # Branch to create pull requests against
-    default_reviewers: ['@ColdFire87']                        # Reviewers to set on pull requests
-    default_assignees: ['@ColdFire87']                        # Assignees to set on pull requests
+    update_schedule: 'monthly'                                # How often to check for updates (live, daily, weekly, monthly)
+    target_branch: 'master'                                   # Branch to create pull requests against
+    default_reviewers: ['@mysense-ai/backend']                # Reviewers to set on pull requests
+    default_assignees: ['@mysense-ai/backend']                # Assignees to set on pull requests
     default_labels: ['dependencies', 'dependabot']            # Labels to set on pull requests
-    ignored_updates:                                          # Ignore certain dependencies or versions
-      # Ignore updates to the serverless framework
-      # until AWS CFN resource name bug is fixed
-      - match:
-          dependency_name: 'serverless'
     commit_message:                                           # Commit message preferences
       prefix: 'fix'                     # production dependencies will be prefixed with `fix(deps):`
       prefix_development: 'chore'       # development dependencies will use `chore(deps-dev):`
