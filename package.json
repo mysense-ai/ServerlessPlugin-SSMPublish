@@ -43,6 +43,7 @@
     "src"
   ],
   "scripts": {
+    "check:updates": "npx npm-check-updates",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "jest --passWithNoTests",
     "test:build": "jest -c '{}' build",
