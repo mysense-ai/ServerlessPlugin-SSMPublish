@@ -1,0 +1,9 @@
+coverage/
+
+.editorconfig
+.travis.yml
+
+*.tgz
+
+src/**/*.test.ts
+src/**/*.test.js

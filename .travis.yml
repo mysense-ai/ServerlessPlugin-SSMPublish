@@ -1,0 +1,44 @@
+language: node_js
+
+node_js:
+  - "node"
+  - "lts/*"
+
+cache: npm
+
+jobs:
+  include:
+    - stage: install
+      name: "Install Dependencies"
+      script: npm install
+    - stage: test
+      name: "Unit Tests + Coverage"
+      script:
+        - npm test
+        - echo "Report Coverage..."
+        - npm run coveralls
+    - stage: publish
+      name: "Publish to NPM"
+      node_js: 'node'
+      script: echo "Publishing to NPM..."
+      before_deploy:
+        - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
+      deploy:
+#        provider: npm
+#        email: stefan.tertan@mysense.ai
+#        api_key:
+#          secure: TODO
+#        on:
+#          branch: master
+#          tags: true
+#          condition: -z $SKIP_PUBLISH
+        provider: script
+        skip_cleanup: true
+        script: npm run release
+        on:
+          tags: true
+
+stages:
+  - install
+  - test
+  - publish

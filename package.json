@@ -1,0 +1,102 @@
+{
+  "name": "serverless-ssm-publish",
+  "version": "0.0.1",
+  "description": "Serverless Framework plugin to publish data to AWS SSM Parameter Store",
+  "author": "Stefan Tertan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ColdFire87/serverless-ssm-publish/issues"
+  },
+  "homepage": "https://github.com/ColdFire87/serverless-ssm-publish#readme",
+  "engines": {
+    "node": ">=8.10.0",
+    "npm": "6.4.1"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ColdFire87/serverless-ssm-publish"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "keywords": [
+    "serverless",
+    "serverless framework",
+    "serverless plugin",
+    "serverless plugins",
+    "serverless applications",
+    "amazon web services",
+    "aws",
+    "aws ssm",
+    "aws parameter store",
+    "amazon",
+    "amazon web services",
+    "serverless.com",
+    "git"
+  ],
+  "main": "build/index.js",
+  "module": "./build",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "jest",
+    "test:build": "jest -c '{}' build",
+    "test:coverage": "jest --coverage",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
+    "preversion": "yarn lint && yarn build && yarn test:build && changelog-verify CHANGELOG.md",
+    "version": "version-changelog CHANGELOG.md && changelog-verify CHANGELOG.md && git add CHANGELOG.md",
+    "release": "cd build && npm publish",
+    "build": "scripts/build.bash"
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "prompt": "^1.0.0",
+    "serverless": "^1.49.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.31",
+    "@types/jest": "^24.0.17",
+    "@types/node": "^12.7.1",
+    "@types/serverless": "^1.18.2",
+    "aws-sdk": "^2.512.0",
+    "aws-sdk-mock": "^4.5.0",
+    "changelog-verify": "^1.1.2",
+    "commitizen": "^4.0.3",
+    "coveralls": "^3.0.6",
+    "cross-env": "5.2.0",
+    "cz-conventional-changelog": "^3.0.2",
+    "husky": "^3.0.4",
+    "jest": "^24.9.0",
+    "jest-environment-node": "^24.9.0",
+    "lint-staged": "^9.2.2",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
+    "version-changelog": "^3.1.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn test"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn lint"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
