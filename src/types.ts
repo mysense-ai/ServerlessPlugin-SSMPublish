@@ -113,6 +113,10 @@ interface Service {
   update(data: { }): { };
 }
 
+interface Classes {
+  Error: any; // tslint:disable-line:no-any
+}
+
 interface SSMPublish {
   enabled: boolean | string | undefined;
   params: SSMParam[] | undefined;
@@ -157,6 +161,7 @@ export interface ServerlessInstance {
         Route53: any;           // tslint:disable-line:no-any
         CloudFormation: any;    // tslint:disable-line:no-any
         ACM: any;               // tslint:disable-line:no-any
+        SSM: any;               // tslint:disable-line:no-any
       };
       getCredentials();
       getRegion();
@@ -164,6 +169,7 @@ export interface ServerlessInstance {
   };
   serverlessDirPath: string;
   service: Service;
+  classes: Classes;
   utils: Utils;
   variables: { };
   version: string;

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { ServerlessInstance, ServerlessOptions /*, SSMParam*/ } from './types';
+import { ServerlessInstance, ServerlessOptions, SSMParam } from './types';
 
 const unsupportedRegionPrefixes = [
   'ap-east-1',    // Hong Kong - region disabled by default
@@ -17,7 +17,7 @@ class ServerlessSSMPublish {
   private readonly provider: any;        // tslint:disable-line:no-any
 
   // AWS SDK resources
-  // private ssm: any;             // tslint:disable-line:no-any
+  private ssm: any;             // tslint:disable-line:no-any
 
   // SSM Publish internal properties
   private initialized = false;
@@ -25,7 +25,7 @@ class ServerlessSSMPublish {
 
   // SSM Publish custom variables
   private region: string;
-  // private params: SSMParam[];
+  private params: SSMParam[] | undefined;
 
   /**
    * Constructor
@@ -68,7 +68,7 @@ class ServerlessSSMPublish {
       // Actual lifecycle event handling
 
       // Serverless lifecycle events
-      'after:package:createDeploymentArtifacts': this.summary.bind(this),  // tslint:disable-line:no-unsafe-any
+      'after:package:createDeploymentArtifacts': this.hookWrapper.bind(this, this.summary.bind(this)),  // tslint:disable-line:no-unsafe-any
       'after:deploy:deploy': this.hookWrapper.bind(this, this.summary.bind(this)),          // tslint:disable-line:no-unsafe-any
       'after:info:info': this.hookWrapper.bind(this, this.summary.bind(this)),              // tslint:disable-line:no-unsafe-any
     };
@@ -96,20 +96,23 @@ class ServerlessSSMPublish {
       this.enabled = this.evaluateEnabled();
 
       if (this.enabled) {
-        // const credentials = this.serverless.providers.aws.getCredentials();
+        const credentials = this.serverless.providers.aws.getCredentials();
 
         // Extract plugin variables
         this.region = this.serverless.service.provider.region;
         // this.params = this.serverless.service.custom.ssmPublish.params || [] as SSMParam[];
 
         // Initialize AWS SDK clients
-        // const credentialsWithRegion = { ...credentials, region: this.region };
-        // this.ssm = new this.serverless.providers.aws.sdk.ACM(credentialsWithRegion);
+        const credentialsWithRegion = { ...credentials, region: this.region };
+        this.ssm = new this.serverless.providers.aws.sdk.SSM(credentialsWithRegion); // tslint:disable-line:no-unsafe-any
+        this.log(this.ssm); // tslint:disable-line:no-unsafe-any
+
+        this.params = this.validateParams();
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
             this.log(chalk.bold.yellow(`The configured region ${this.region} does not support SSM. Plugin disabled`));
-            // this.enabled = false;
+            this.enabled = false;
           }
         });
       }
@@ -126,12 +129,12 @@ class ServerlessSSMPublish {
    * If the property's value is provided, this should be boolean, otherwise an exception is thrown.
    */
   private evaluateEnabled(): boolean {
-    if (!this.serverless.service.custom || !this.serverless.service.custom.ssmPublish) {
-      throw new Error('serverless-ssm-publish: Plugin configuration is missing.');
+    if (!this.serverless.service.custom?.ssmPublish) {
+      this.throwError('Plugin configuration is missing.');
     }
 
     const enabled = this.serverless.service.custom.ssmPublish.enabled;
-    const err = new Error(`serverless-ssm-publish: Ambiguous value for "enabled": '${enabled}'`);
+    // const err = new Error(`Ambiguous value for "enabled": '${enabled}'`);
 
     // Enabled by default
     if (enabled === undefined) {
@@ -143,11 +146,45 @@ class ServerlessSSMPublish {
         return enabled;
       case 'string':
         if (enabled === 'true') return true;
-        if (enabled === 'false') return false;
-        throw err;
+        if (enabled === 'false') {
+          return false;
+        }
+        this.log(chalk.bold.red(`Ambiguous value for "enabled": '${enabled}'`));
+        return false;
+        // Should we be throwing here?
+        // throw err;
       default:
-        throw err;
+        this.log(chalk.bold.red(`Ambiguous value for "enabled": '${enabled}'`));
+        return false;
+        // Should we be throwing here?
+        // throw err;
     }
+  }
+
+  /**
+   * Validates params passed in serverless.yaml
+   *
+   * Throws error if no params or incorrect syntax.
+   * Might want to call this in evaluateEnabled?
+   */
+
+  private validateParams(): SSMParam[] | undefined {
+
+    if (!this.serverless.service?.custom?.ssmPublish?.params || !this.serverless.service?.custom?.ssmPublish?.params.length) {
+      this.throwError('No params defined'); // should we just disable and log a warning here?
+    }
+
+    const validateParam = (param: SSMParam) => {
+      if (!['Path', 'Value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey))) {
+        this.throwError('Path and Value are required fields for params');
+      }
+      if (typeof param.secure !== 'boolean') {
+        this.log(`Param at path ${param.path} should pass Secure as boolean value`);
+      }
+      return { ...param, Secure: !!param.secure };
+    };
+
+    return this.serverless.service.custom.ssmPublish.params?.map(validateParam);
   }
 
   // /**
@@ -168,6 +205,14 @@ class ServerlessSSMPublish {
     }
   }
 
+  // /**
+  //  * Throws error using Serverless formatting
+  //  * @param message message to be printed
+  //  */
+  private throwError(message: string) {
+    throw new this.serverless.classes.Error(`[serverless-ssm-publish]: ${message}`); // tslint:disable-line:no-unsafe-any
+  }
+
   // private listParams() {
   //   return this.ssm.listParams({ params: this.params }).promise();
   // }
@@ -176,7 +221,7 @@ class ServerlessSSMPublish {
     // const param = await this.provider.request('SSM', 'getParam', { }).promise();
     // this.log(chalk.bold.grey(param));
 
-    this.log(chalk.bold.green.underline('This ran after everything was successfully deployed!'));
+    this.log(chalk.bold.green.underline(`This ran after everything was successfully deployed!, ${JSON.stringify(this.params)}`));
   }
 }
 
