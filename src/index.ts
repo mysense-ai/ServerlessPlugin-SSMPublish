@@ -14,7 +14,7 @@ const unsupportedRegionPrefixes = [
   'me-south-1',   // Bahrain - region disabled by default
 ];
 
-export class ServerlessSSMPublish {
+class ServerlessSSMPublish {
 
   // Serverless specific properties
   public hooks: { [i: string]: () => void };
@@ -224,3 +224,5 @@ export class ServerlessSSMPublish {
     this.serverless.cli.log(chalk.bold.green.underline('This ran after everything was successfully deployed!'));
   }
 }
+
+module.exports = ServerlessSSMPublish;
