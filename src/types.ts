@@ -179,7 +179,7 @@ export interface ServerlessInstance {
 }
 
 export interface ServerlessOptions {
-  message: string;
+  encryption: string;
 }
 
 export interface SSMParam {
