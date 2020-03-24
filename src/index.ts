@@ -38,10 +38,10 @@ class ServerlessSSMPublish {
 
     // Bind plugin to aws provider. It will not run on a different provider.
     this.provider = this.serverless.getProvider('aws');
-    this.serverless.cli.log(`Provider is: ${this.provider}`);
+    this.logIfDebug(`Provider is: ${this.provider}`);
 
     // Log options (for use later)
-    this.serverless.cli.log(`Encryption option for params: ${this.options.encryption}`);
+    this.logIfDebug(`Encryption option for params: ${this.options.encryption}`);
 
     // Optional
     this.commands = {
@@ -82,7 +82,7 @@ class ServerlessSSMPublish {
     this.initializeVariables();
 
     if (!this.enabled) {
-      this.serverless.cli.log('serverless-ssm-publish: SSM Publish is disabled.');
+      this.log('serverless-ssm-publish: SSM Publish is disabled.');
     } else {
       return lifecycleFunc.call(this);  // tslint:disable-line:no-unsafe-any
     }
@@ -108,7 +108,7 @@ class ServerlessSSMPublish {
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
-            this.serverless.cli.log(chalk.bold.yellow(`The configured region ${this.region} does not support SSM. Plugin disabled`));
+            this.log(chalk.bold.yellow(`The configured region ${this.region} does not support SSM. Plugin disabled`));
             // this.enabled = false;
           }
         });
@@ -151,14 +151,22 @@ class ServerlessSSMPublish {
   }
 
   // /**
-  //  * Logs message if SLS_DEBUG is set
+  //  * Logs message with prefix
   //  * @param message message to be printed
   //  */
-  // private logIfDebug(message: string): void {
-  //   if (process.env.SLS_DEBUG) {
-  //     this.serverless.cli.log(message, 'Serverless SSM Publish');
-  //   }
-  // }
+  private log(message: string): void {
+    this.serverless.cli.log(`[serverless-ssm-publish]: ${message}`);
+}
+
+  // /**
+  //  * Logs message with prefix if SLS_DEBUG is set
+  //  * @param message message to be printed
+  //  */
+  private logIfDebug(message: string): void {
+    if (process.env.SLS_DEBUG) {
+      this.serverless.cli.log(`[serverless-ssm-publish]: ${message}`);
+    }
+  }
 
   // private listParams() {
   //   return this.ssm.listParams({ params: this.params }).promise();
@@ -166,9 +174,9 @@ class ServerlessSSMPublish {
 
   private summary() {
     // const param = await this.provider.request('SSM', 'getParam', { }).promise();
-    // this.serverless.cli.log(chalk.bold.grey(param));
+    // this.log(chalk.bold.grey(param));
 
-    this.serverless.cli.log(chalk.bold.green.underline('This ran after everything was successfully deployed!'));
+    this.log(chalk.bold.green.underline('This ran after everything was successfully deployed!'));
   }
 }
 
