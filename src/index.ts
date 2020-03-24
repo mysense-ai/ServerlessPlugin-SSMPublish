@@ -24,7 +24,6 @@ class ServerlessSSMPublish {
   private readonly provider: any;        // tslint:disable-line:no-any
 
   // AWS SDK resources
-  // private cloudformation: any;  // tslint:disable-line:no-any
   // private ssm: any;             // tslint:disable-line:no-any
 
   // SSM Publish internal properties
@@ -112,7 +111,6 @@ class ServerlessSSMPublish {
         // Initialize AWS SDK clients
         // const credentialsWithRegion = { ...credentials, region: this.region };
         // this.ssm = new this.serverless.providers.aws.sdk.ACM(credentialsWithRegion);
-        // this.cloudformation = new this.serverless.providers.aws.sdk.CloudFormation(credentialsWithRegion);
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
@@ -157,35 +155,6 @@ class ServerlessSSMPublish {
         throw err;
     }
   }
-
-  // /**
-  //  * Gets rest API id from CloudFormation stack
-  //  */
-  // private async getRestApiId(): Promise<string> {
-  //   if (this.serverless.service.provider.apiGateway && this.serverless.service.provider.apiGateway.restApiId) {
-  //     this.serverless.cli.log(`Mapping custom domain to existing API ${this.serverless.service.provider.apiGateway.restApiId}.`);
-  //     return this.serverless.service.provider.apiGateway.restApiId;
-  //   }
-  //   const stackName = this.serverless.service.provider.stackName ||
-  //     `${this.serverless.service.name}-${this.serverless.service.provider.stage}`;
-  //   const params = {
-  //     LogicalResourceId: 'ApiGatewayRestApi',
-  //     StackName: stackName,
-  //   };
-  //
-  //   let response;
-  //   try {
-  //     response = await this.cloudformation.describeStackResource(params).promise();
-  //   } catch (err) {
-  //     this.logIfDebug(err);
-  //     throw new Error(`Error: Failed to find CloudFormation resources for ${stackName}\n`);
-  //   }
-  //   const restApiId = response.StackResourceDetail.PhysicalResourceId;
-  //   if (!restApiId) {
-  //     throw new Error(`Error: No RestApiId associated with CloudFormation stack ${stackName}`);
-  //   }
-  //   return restApiId;
-  // }
 
   // /**
   //  * Logs message if SLS_DEBUG is set
