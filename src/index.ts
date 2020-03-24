@@ -2,13 +2,6 @@ import chalk from 'chalk';
 
 import { ServerlessInstance, ServerlessOptions /*, SSMParam*/ } from './types';
 
-/*
-    Ways to implement plugin:
-      1. Writing a new CLI command
-      2. Extend an existing command to implement additional functionality
-      3. Write your own implementation of an existing command from scratch (custom provider)
- */
-
 const unsupportedRegionPrefixes = [
   'ap-east-1',    // Hong Kong - region disabled by default
   'me-south-1',   // Bahrain - region disabled by default
@@ -47,19 +40,23 @@ class ServerlessSSMPublish {
     this.provider = this.serverless.getProvider('aws');
     this.serverless.cli.log(`Provider is: ${this.provider}`);
 
+    // Log options (for use later)
+    this.serverless.cli.log(`Encryption option for params: ${this.options.encryption}`);
+
     // Optional
     this.commands = {
-      welcome: {
-        usage: 'Helps you start your first Serverless plugin',
+      ssmPublish: {
+        usage: 'Helps you publish params to SSM',
         lifecycleEvents: [
-          'hello',
-          'world',
+          'checkIfExists',
+          'checkIfIdentical',
+          'upsertParam',
         ],
         options: {
-          message: {
-            usage: `Specify the message you want to deploy (e.g. "--message 'My Message'" or "-m 'My Message'")`,
-            required: true,
-            shortcut: 'm',
+          encryption: {
+            usage: `Specify whether param should be encrypted - defaults to true (e.g. "--encryption true" or "-e true")`,
+            required: false,
+            shortcut: 'e',
           },
         },
       },
@@ -67,14 +64,11 @@ class ServerlessSSMPublish {
 
     this.hooks = {
       // Pre & post hooks
-      'before:welcome:hello': this.hookWrapper.bind(this, this.beforeWelcome.bind(this)),   // tslint:disable-line:no-unsafe-any
-      'after:welcome:world': this.hookWrapper.bind(this, this.afterHelloWorld.bind(this)),  // tslint:disable-line:no-unsafe-any
 
       // Actual lifecycle event handling
-      'welcome:hello': this.hookWrapper.bind(this, this.welcomeUser.bind(this)),            // tslint:disable-line:no-unsafe-any
-      'welcome:world': this.hookWrapper.bind(this, this.displayHelloMessage.bind(this)),    // tslint:disable-line:no-unsafe-any
 
       // Serverless lifecycle events
+      'after:package:createDeploymentArtifacts': this.summary.bind(this),  // tslint:disable-line:no-unsafe-any
       'after:deploy:deploy': this.hookWrapper.bind(this, this.summary.bind(this)),          // tslint:disable-line:no-unsafe-any
       'after:info:info': this.hookWrapper.bind(this, this.summary.bind(this)),              // tslint:disable-line:no-unsafe-any
     };
@@ -169,22 +163,6 @@ class ServerlessSSMPublish {
   // private listParams() {
   //   return this.ssm.listParams({ params: this.params }).promise();
   // }
-
-  private beforeWelcome() {
-    this.serverless.cli.log(chalk.bold.yellow('Hello from Serverless!'));
-  }
-
-  private welcomeUser() {
-    this.serverless.cli.log(chalk.bold.grey('Your message:'));
-  }
-
-  private displayHelloMessage() {
-    this.serverless.cli.log(chalk.bold.red(this.options.message));
-  }
-
-  private afterHelloWorld() {
-    this.serverless.cli.log(chalk.bold.green('Please come again!'));
-  }
 
   private summary() {
     // const param = await this.provider.request('SSM', 'getParam', { }).promise();
