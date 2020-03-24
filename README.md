@@ -21,12 +21,12 @@ custom:
   ssmPublish:
     enabled: true
     params:
-      - Path: /global/tokens/secretToken
-        Value: ${self:custom.secretToken}
-        Secure: true
-      - Path: /service/config/storageBucket
-        Value: !Ref StorageBucket
-        Secure: false         # false is default value
+      - path: /global/tokens/secretToken
+        value: ${self:custom.secretToken}
+        secure: true
+      - path: /service/config/storageBucket
+        value: !Ref StorageBucket
+        secure: false         # false is default value
 ```
 
 ## Version History

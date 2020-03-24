@@ -183,7 +183,7 @@ export interface ServerlessOptions {
 }
 
 export interface SSMParam {
-  Path: string;
-  Value: string;
-  Secure?: boolean;
+  path: string;
+  value: string;
+  secure?: boolean;
 }
