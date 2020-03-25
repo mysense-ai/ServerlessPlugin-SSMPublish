@@ -148,13 +148,11 @@ class ServerlessSSMPublish {
         if (enabled === 'false') {
           return false;
         }
-        this.log(chalk.bold.red(`Ambiguous value for "enabled": '${enabled}'`));
+        this.throwError(`Ambiguous value for "enabled": '${enabled}'`);
         return false;
-        // Should we be throwing here?
       default:
-        this.log(chalk.bold.red(`Ambiguous value for "enabled": '${enabled}'`));
+        this.throwError(`Ambiguous value for "enabled": '${enabled}'`);
         return false;
-        // Should we be throwing here?
     }
   }
 
@@ -166,7 +164,7 @@ class ServerlessSSMPublish {
    */
   private validateParams(): SSMParam[] | undefined {
     if (!this.serverless.service?.custom?.ssmPublish?.params || !this.serverless.service?.custom?.ssmPublish?.params.length) {
-      this.throwError('No params defined'); // should we just disable and log a warning here?
+      this.throwError('No params defined');
     }
 
     const validateParam = (param: SSMParam) => {
@@ -205,9 +203,9 @@ class ServerlessSSMPublish {
     }
     , { nonExistingParams: [], existingChangedParams: [], existingUnchangedParams: [] });
 
-    this.logIfDebug(`New param paths: ${nonExistingParams.map((param) => param.path).join(', ')}`);
-    this.logIfDebug(`Changed param paths: ${existingChangedParams.map((param) => param.path).join(', ')}`);
-    this.logIfDebug(`Unchanged param paths: ${existingUnchangedParams.map((param) => param.path).join(', ')}`);
+    this.logIfDebug(`New param paths:\n\t${nonExistingParams.map((param) => param.path).join('\n\t')}`);
+    this.logIfDebug(`Changed param paths:\n\t${existingChangedParams.map((param) => param.path).join('\n\t')}`);
+    this.logIfDebug(`Unchanged param paths:\n\t${existingUnchangedParams.map((param) => param.path).join('\n\t')}`);
 
     this.nonExistingParams = nonExistingParams;
     this.existingChangedParams = existingChangedParams;
