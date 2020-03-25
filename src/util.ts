@@ -3,13 +3,13 @@ import chalk from 'chalk';
 
 import { ServerlessInstance, SSMParam } from './types';
 
-  /**
-   * Determines whether this plugin should be enabled.
-   *
-   * This method reads the ssmPublish property "enabled" to see if this plugin should be enabled.
-   * If the property's value is undefined, a default value of true is assumed (for backwards compatibility).
-   * If the property's value is provided, this should be boolean, otherwise an exception is thrown.
-   */
+/**
+ * Determines whether this plugin should be enabled.
+ *
+ * This method reads the ssmPublish property "enabled" to see if this plugin should be enabled.
+ * If the property's value is undefined, a default value of true is assumed (for backwards compatibility).
+ * If the property's value is provided, this should be boolean, otherwise an exception is thrown.
+ */
 export const evaluateEnabled = (serviceCustomBlock: ServerlessInstance['service']['custom'], throwFunction: (message) => void): boolean  => {
     if (!serviceCustomBlock || !serviceCustomBlock.ssmPublish) {
       throwFunction('Plugin configuration is missing.');
