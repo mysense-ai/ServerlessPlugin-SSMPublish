@@ -1,7 +1,7 @@
 import { SSM } from 'aws-sdk';
 import chalk from 'chalk';
 
-import { ServerlessInstance, ServerlessOptions, SSMParam } from './types';
+import { ServerlessInstance, SSMParam } from './types';
 import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
@@ -16,7 +16,6 @@ class ServerlessSSMPublish {
   public commands: object;
 
   private readonly serverless: ServerlessInstance;
-  private readonly options: ServerlessOptions;
   private readonly provider: any;        // tslint:disable-line:no-any
 
   // AWS SDK resources
@@ -38,13 +37,11 @@ class ServerlessSSMPublish {
    * @param serverless
    * @param options
    */
-  constructor(serverless: ServerlessInstance, options: ServerlessOptions) {
+  constructor(serverless: ServerlessInstance) {
     this.serverless = serverless;
-    this.options = options;
 
     // Bind plugin to aws provider. It will not run on a different provider.
     this.provider = this.serverless.getProvider('aws');
-    this.logIfDebug(`Options passed in: ${String(this.options)}`);
 
     // Optional
     this.commands = {
@@ -147,7 +144,7 @@ class ServerlessSSMPublish {
     const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParam) => this.ssm.putParameter(
       {
         Name: param.path,
-        Description: param.description || `Placed by ${this.serverless.service.package.name} - serverless-ssm-plugin`,
+        Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
         Value: param.value,
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
