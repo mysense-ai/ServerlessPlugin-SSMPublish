@@ -168,12 +168,20 @@ class ServerlessSSMPublish {
     }
 
     const validateParam = (param: SSMParam) => {
-      if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey))) {
+      const maxNameLength = 1011; // needs to account for ARN stuff being added
+      const maxDepth = 15;
+      if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey)))
         this.throwError('Path and Value are required fields for params');
-      }
       if (typeof param.secure !== 'boolean') {
-        this.log(`Param at path ${param.path} should pass Secure as boolean value`);
+        this.log(chalk.redBright(`Param at path ${param.path} should pass Secure as boolean value`));
       }
+      if (
+          param.path.match(/^(aws|ssm)/gi) || // check if name begins with illegal patterns (aws/ssm)
+          param.path.match(/[^a-zA-Z0-9_.\-\/]/g) || // check if name contains illegal characters
+          (param.path.match(/\//g) || []).length > maxDepth ||
+          param.path.length > maxNameLength
+        )
+        this.throwError(`Param ${param.path} name doesn't match AWS constraints`);
       return { ...param, Secure: !!param.secure };
     };
 
@@ -226,7 +234,7 @@ class ServerlessSSMPublish {
       },
         ).promise(),
       ));
-    this.logIfDebug(`SSM Put Results: ${putResults.join('/n ')}`);
+    this.logIfDebug(`SSM Put Results:\n\t${putResults.join('\n\t')}`);
 }
 
   /**
