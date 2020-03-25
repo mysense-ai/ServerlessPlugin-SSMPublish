@@ -90,8 +90,13 @@ interface Provider {
   versionFunctions: boolean;
 }
 
+interface Package {
+  name: string;
+}
+
 interface Service {
   name: string;
+  package: Package;
   provider: Provider;
   custom: {
     ssmPublish: SSMPublish;
