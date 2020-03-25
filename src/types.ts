@@ -90,8 +90,13 @@ interface Provider {
   versionFunctions: boolean;
 }
 
+interface Package {
+  name: string;
+}
+
 interface Service {
   name: string;
+  package: Package;
   provider: Provider;
   custom: {
     ssmPublish: SSMPublish;
@@ -111,6 +116,10 @@ interface Service {
   validate(): Service;
 
   update(data: { }): { };
+}
+
+interface Classes {
+  Error: any; // tslint:disable-line:no-any
 }
 
 interface SSMPublish {
@@ -157,6 +166,7 @@ export interface ServerlessInstance {
         Route53: any;           // tslint:disable-line:no-any
         CloudFormation: any;    // tslint:disable-line:no-any
         ACM: any;               // tslint:disable-line:no-any
+        SSM: any;               // tslint:disable-line:no-any
       };
       getCredentials();
       getRegion();
@@ -164,6 +174,7 @@ export interface ServerlessInstance {
   };
   serverlessDirPath: string;
   service: Service;
+  classes: Classes;
   utils: Utils;
   variables: { };
   version: string;
@@ -183,7 +194,7 @@ export interface ServerlessOptions {
 }
 
 export interface SSMParam {
-  Path: string;
-  Value: string;
-  Secure?: boolean;
+  path: string;
+  value: string;
+  secure?: boolean;
 }
