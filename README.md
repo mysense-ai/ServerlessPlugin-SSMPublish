@@ -15,7 +15,6 @@ Publish custom data to AWS SSM Parameter Store
 ## Usage
 ```yaml
 custom:
-  # Can specify value on command line `sls deploy --secretToken MY_SECRET_VALUE`
   secretToken: ${opt:secretToken}
 
   ssmPublish:
@@ -23,10 +22,11 @@ custom:
     params:
       - path: /global/tokens/secretToken
         value: ${self:custom.secretToken}
-        secure: true
+        description: Super Secret Token       # description is optional
+        secure: true                          # defaults to true
       - path: /service/config/storageBucket
         value: !Ref StorageBucket
-        secure: false         # false is default value
+        secure: false
 ```
 
 ## Version History

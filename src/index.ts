@@ -169,6 +169,7 @@ class ServerlessSSMPublish {
 
     const validateParam = (param: SSMParam) => {
       const maxNameLength = 1011; // needs to account for ARN stuff being added
+      const maxDescriptionLength = 1024;
       const maxDepth = 15;
       if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey)))
         this.throwError('Path and Value are required fields for params');
@@ -182,6 +183,8 @@ class ServerlessSSMPublish {
           param.path.length > maxNameLength
         )
         this.throwError(`Param ${param.path} name doesn't match AWS constraints`);
+      if (param.description && param.description.length > maxDescriptionLength)
+        this.throwError(`Param ${param.path} description is too long`);
       return { ...param, Secure: !!param.secure };
     };
 
@@ -227,7 +230,7 @@ class ServerlessSSMPublish {
     const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParam) => this.ssm.putParameter(
       {
         Name: param.path,
-        Description: `Placed by ${this.serverless.service.package.name} - serverless-ssm-plugin`,
+        Description: param.description || `Placed by ${this.serverless.service.package.name} - serverless-ssm-plugin`,
         Value: param.value,
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
