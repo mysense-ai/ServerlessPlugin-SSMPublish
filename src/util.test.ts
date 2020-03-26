@@ -7,13 +7,13 @@ const logFunction = (message: string): void => { console.log(message); }; // tsl
 describe('evaluateEnabled should correctly validate if the plugin is enabled', () => {
 
   test('It should throw if no ssmPublish settings are passed', () => {
-    const testEvalute = () => evaluateEnabled({ } as ServerlessInstance['service']['custom'], throwFunction); // tslint:disable-line:no-object-literal-type-assertion
-    expect(testEvalute).toThrow();
+    const testEvaluate = () => evaluateEnabled({ } as ServerlessInstance['service']['custom'], throwFunction); // tslint:disable-line:no-object-literal-type-assertion
+    expect(testEvaluate).toThrow();
   });
 
   test('It should throw if enabled is a string and not true or false', () => {
-    const testEvalute = () => evaluateEnabled({ ssmPublish: { enabled: 'bla'}} as ServerlessInstance['service']['custom'] , throwFunction); // tslint:disable-line:no-object-literal-type-assertion
-    expect(testEvalute).toThrow(); // tslint:disable-line:no-object-literal-type-assertion
+    const testEvaluate = () => evaluateEnabled({ ssmPublish: { enabled: 'bla'}} as ServerlessInstance['service']['custom'] , throwFunction); // tslint:disable-line:no-object-literal-type-assertion
+    expect(testEvaluate).toThrow(); // tslint:disable-line:no-object-literal-type-assertion
   });
 
   test('It should return false if enabled is set to false', () => {
