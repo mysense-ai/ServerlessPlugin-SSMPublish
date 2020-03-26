@@ -24,12 +24,13 @@ jobs:
     - stage: publish
       name: "Build and publish to NPM"
       node_js: 'node'
+      script: skip
       deploy:
         provider: script
         skip_cleanup: true
         script:
           - echo "Building.."
-          - yarn build
+          - yarn build:ci
           - echo "Publishing to NPM..."
           - yarn semantic-release
         on:

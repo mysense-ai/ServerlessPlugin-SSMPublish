@@ -53,7 +53,8 @@
     "version": "version-changelog CHANGELOG.md && changelog-verify CHANGELOG.md && git add CHANGELOG.md",
     "semantic-release": "semantic-release",
     "release": "cd build && npm publish",
-    "build": "rm -rf build && yarn tsc"
+    "build": "scripts/build.bash",
+    "build:ci": "yarn tsc"
   },
   "dependencies": {
     "chalk": "^3.0.0",
