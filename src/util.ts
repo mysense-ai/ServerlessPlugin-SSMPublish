@@ -54,7 +54,7 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
       if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey)))
         throwFunction('Path and Value are required fields for params');
       if (param.secure && typeof param.secure !== 'boolean') { // tslint:disable-line:strict-type-predicates
-        logFunction(chalk.redBright(`Param at path ${param.path} should pass Secure as boolean value`));
+        logFunction(chalk.redBright(`Param at path ${param.path} should pass secure as boolean value`));
       }
       if (
           param.path.match(/^(aws|ssm)/gi) || // check if name begins with illegal patterns (aws/ssm)
@@ -65,7 +65,7 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
         throwFunction(`Param ${param.path} name doesn't match AWS constraints`);
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
-      return { ...param, secure: !!param.secure };
+      return { ...param, secure: param.secure === false ? false : true };
     };
 
     return ssmPublishSettings.params?.map(validateParam);
@@ -74,8 +74,9 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
 /**
  * Helper function to compare values in sls.yaml and remote SSM
  */
-export const compareParams = (localParams: SSMParam[], remoteParams: SSM.GetParametersResult) => localParams.reduce< { nonExistingParams: SSMParam[]; existingChangedParams: SSMParam[]; existingUnchangedParams: SSMParam[] }>((acc, curr) => {
-  const existingParam = remoteParams.Parameters?.find((param) => param.Name === curr.path);
+export const compareParams = (localParams: SSMParam[], remoteParams: SSM.GetParametersResult['Parameters']) => localParams.reduce< { nonExistingParams: SSMParam[]; existingChangedParams: SSMParam[]; existingUnchangedParams: SSMParam[] }>((acc, curr) => {
+
+  const existingParam = remoteParams?.find((param) => param.Name === curr.path);
   if (!existingParam) {
     acc.nonExistingParams.push(curr);
     return acc;

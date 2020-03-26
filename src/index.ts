@@ -126,7 +126,9 @@ class ServerlessSSMPublish {
     if (!this.params) return;
     const retrievedParameters = await this.ssm.getParameters({ Names: this.params.map((param) => param.path), WithDecryption: true}).promise();
 
-    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, retrievedParameters);
+    if (retrievedParameters.InvalidParameters?.length) this.log(chalk.red(`Invalid Parameters present:\n\t${retrievedParameters.InvalidParameters.join('\n\t')}`));
+
+    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, retrievedParameters.Parameters);
 
     this.logIfDebug(`New param paths:\n\t${nonExistingParams.map((param) => param.path).join('\n\t')}`);
     this.logIfDebug(`Changed param paths:\n\t${existingChangedParams.map((param) => param.path).join('\n\t')}`);

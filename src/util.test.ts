@@ -1,11 +1,5 @@
-import { ServerlessInstance,
-  // SSMParam,
-} from './types';
-import {
-  // compareParams,
-  evaluateEnabled,
-   validateParams,
-  } from './util';
+import { ServerlessInstance } from './types';
+import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const throwFunction = (message: string): void => { throw new Error(message); };
 const logFunction = (message: string): void => { console.log(message); }; // tslint:disable-line:no-console
@@ -81,20 +75,56 @@ describe('validateParams should correctly validate user input', () => {
     expect(testValidate).toThrow(`Param test description is too long`);
   });
 
-  test('It should return valid input as expected', () => {
+  test('It should return valid input as expected (default secure to true)', () => {
     const mockData = {
       enabled: true,
       params: [
         { path: 'test/param', value: 'test'},
-        { path: 'test/param', value: 'test', description: 'valid'},
-        { path: 'test/param', value: 'test', secure: true, description: 'valid'},
+        { path: 'test/param1', value: 'test', secure: false, description: 'valid'},
+        { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
       ],
     };
     const expectedResult = [
-      { path: 'test/param', value: 'test', secure: false},
-      { path: 'test/param', value: 'test', secure: false, description: 'valid'},
-      { path: 'test/param', value: 'test', secure: true, description: 'valid'},
+      { path: 'test/param', value: 'test', secure: true},
+      { path: 'test/param1', value: 'test', secure: false, description: 'valid'},
+      { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
     ];
     expect(validateParams(mockData, throwFunction, logFunction)).toStrictEqual(expectedResult);
   });
+});
+
+describe('compareParams should correctly compare and sort local and remote params', () => {
+
+  test('It should show all local params as nonExisting if no remote params were found', () => {
+    const localMockData1 =  [
+      { path: '/test/ssmParams/testToken2', value: 'update', description: 'test description', secure: true},
+    ];
+    expect(compareParams(localMockData1, []).nonExistingParams).toStrictEqual(localMockData1);
+  });
+
+  test('It should correctly assign all 3 possibilities', () => {
+    const localMockData =  [
+      { path: '/test/ssmParams/unchangedToken', value: 'update', description: 'test description', secure: true},
+      { path: '/test/ssmParams/changedToken', value: 'testtesttest', secure: true},
+      { path: '/test/ssmParams/nonExistingToken', value: 'newToken', secure: true},
+    ];
+
+    const remoteMockData = [
+      {
+      Name: '/test/ssmParams/changedToken',
+      Type: 'String',
+      Value: 'changed',
+      },
+      {
+      Name: '/test/ssmParams/unchangedToken',
+      Type: 'SecureString',
+      Value: 'update',
+      },
+    ];
+    expect(compareParams(localMockData, remoteMockData).existingUnchangedParams).toStrictEqual([localMockData[0]]);
+    expect(compareParams(localMockData, remoteMockData).existingChangedParams).toStrictEqual([localMockData[1]]);
+    expect(compareParams(localMockData, remoteMockData).nonExistingParams).toStrictEqual([localMockData[2]]); // tslint:disable-line:no-magic-numbers
+
+    });
+
 });

@@ -4,6 +4,7 @@ module.exports = {
   'testMatch': ['**/*.test.ts'],
   'moduleFileExtensions': [ 'ts', 'tsx', 'js' ],
   'coverageDirectory': '.coverage',
+  "collectCoverageFrom": ["src/**/*.{js,ts,tsx}"],
   'testPathIgnorePatterns': [
     '/node_modules/',
     '/build/',
