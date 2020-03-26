@@ -25,25 +25,13 @@ jobs:
       name: "Publish to NPM"
       node_js: 'node'
       script: echo "Publishing to NPM..."
-      before_deploy:
-        - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
       deploy:
-#        provider: npm
-#        email: stefan.tertan@mysense.ai
-#        api_key:
-#          secure: TODO
-#        on:
-#          branch: master
-#          tags: true
-#          condition: -z $SKIP_PUBLISH
         provider: script
         skip_cleanup: true
-        script: echo 'deploying to NPM'
-          # npm run build && npm run semantic-release
-        on:
-          tags: true
+        script: npm run build && npm run semantic-release
 
 stages:
   - install
   - test
   - publish
+    if: branch = master
