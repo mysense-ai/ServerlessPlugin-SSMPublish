@@ -22,16 +22,20 @@ jobs:
         - echo "Report Coverage..."
         - npm run codecov
     - stage: publish
-      name: "Publish to NPM"
+      name: "Build and publish to NPM"
       node_js: 'node'
-      script: echo "Publishing to NPM..."
       deploy:
         provider: script
         skip_cleanup: true
-        script: npm run build && npm run semantic-release
+        script:
+          - echo "Building.."
+          - npm run build
+          - echo "Publishing to NPM..."
+          - npm run semantic-release
+        on:
+          branch: master
 
 stages:
   - install
   - test
   - publish
-    if: branch = master
