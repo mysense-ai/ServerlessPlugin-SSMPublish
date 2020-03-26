@@ -53,7 +53,7 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
       const maxDepth = 15;
       if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey)))
         throwFunction('Path and Value are required fields for params');
-      if (typeof param.secure !== 'boolean') {
+      if (param.secure && typeof param.secure !== 'boolean') { // tslint:disable-line:strict-type-predicates
         logFunction(chalk.redBright(`Param at path ${param.path} should pass Secure as boolean value`));
       }
       if (
@@ -65,7 +65,7 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
         throwFunction(`Param ${param.path} name doesn't match AWS constraints`);
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
-      return { ...param, Secure: !!param.secure };
+      return { ...param, secure: !!param.secure };
     };
 
     return ssmPublishSettings.params?.map(validateParam);
