@@ -7,7 +7,7 @@ module.exports = {
   "collectCoverageFrom": ["src/**/*.{js,ts,tsx}"],
   'testPathIgnorePatterns': [
     '/node_modules/',
-    '/build/',
+    // '/build/', // Travis places our build in a build folder which results in jest ignoring our tests
     'd.ts'
   ]
 };

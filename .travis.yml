@@ -4,39 +4,36 @@ node_js:
   - "node"
   - "lts/*"
 
-cache: npm
+cache: yarn
+
+# branches:
+#   only:
+#     - master
 
 jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script: npm install
+      script: yarn
     - stage: test
       name: "Unit Tests + Coverage"
       script:
-        - npm test
+        - yarn test:coverage
         - echo "Report Coverage..."
-        - npm run coveralls
+        - yarn codecov
     - stage: publish
-      name: "Publish to NPM"
+      name: "Build and publish to NPM"
       node_js: 'node'
-      script: echo "Publishing to NPM..."
-      before_deploy:
-        - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > ~/.npmrc
       deploy:
-#        provider: npm
-#        email: stefan.tertan@mysense.ai
-#        api_key:
-#          secure: TODO
-#        on:
-#          branch: master
-#          tags: true
-#          condition: -z $SKIP_PUBLISH
         provider: script
         skip_cleanup: true
-        script: npm run release
+        script:
+          - echo "Building.."
+          - yarn build
+          - echo "Publishing to NPM..."
+          - yarn semantic-release
         on:
-          tags: true
+          branch: master
 
 stages:
   - install
