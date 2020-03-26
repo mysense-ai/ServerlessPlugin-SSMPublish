@@ -18,9 +18,9 @@ jobs:
     - stage: test
       name: "Unit Tests + Coverage"
       script:
-        - npm test:coverage
+        - npm run test:coverage
         - echo "Report Coverage..."
-        - npm run codecov
+        - npm codecov
     - stage: publish
       name: "Publish to NPM"
       node_js: 'node'
