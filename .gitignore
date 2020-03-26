@@ -108,5 +108,9 @@ archives
 .cache-loader
 .uglify-cache
 
+# IDEs
 .vscode
 .idea
+
+# Test Coverage
+.coverage

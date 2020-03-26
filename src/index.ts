@@ -1,7 +1,8 @@
 import { SSM } from 'aws-sdk';
 import chalk from 'chalk';
 
-import { ServerlessInstance, ServerlessOptions, SSMParam } from './types';
+import { ServerlessInstance, SSMParam } from './types';
+import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
   'ap-east-1',    // Hong Kong - region disabled by default
@@ -15,7 +16,6 @@ class ServerlessSSMPublish {
   public commands: object;
 
   private readonly serverless: ServerlessInstance;
-  private readonly options: ServerlessOptions;
   private readonly provider: any;        // tslint:disable-line:no-any
 
   // AWS SDK resources
@@ -37,13 +37,11 @@ class ServerlessSSMPublish {
    * @param serverless
    * @param options
    */
-  constructor(serverless: ServerlessInstance, options: ServerlessOptions) {
+  constructor(serverless: ServerlessInstance) {
     this.serverless = serverless;
-    this.options = options;
 
     // Bind plugin to aws provider. It will not run on a different provider.
     this.provider = this.serverless.getProvider('aws');
-    this.logIfDebug(`Options passed in: ${String(this.options)}`);
 
     // Optional
     this.commands = {
@@ -65,13 +63,11 @@ class ServerlessSSMPublish {
       'ssmPublish:upsertParams': this.hookWrapper.bind(this, this.updateParams.bind(this)),            // tslint:disable-line:no-unsafe-any
 
       // Serverless lifecycle events
-      'after:package:createDeploymentArtifacts': async () => { // check if this is the best place to call our plugin
+      'after:deploy:deploy': async () => { // check if this is the best place to call our plugin
         await this.hookWrapper.bind(this, this.getAndCheckParams.bind(this))();                        // tslint:disable-line:no-unsafe-any
         await this.hookWrapper.bind(this, this.updateParams.bind(this))();                             // tslint:disable-line:no-unsafe-any
         this.hookWrapper.bind(this, this.summary.bind(this))();                                        // tslint:disable-line:no-unsafe-any
       },
-      'after:deploy:deploy': this.hookWrapper.bind(this, this.summary.bind(this)),                     // tslint:disable-line:no-unsafe-any
-      'after:info:info': this.hookWrapper.bind(this, this.summary.bind(this)),                         // tslint:disable-line:no-unsafe-any
     };
   }
 
@@ -94,7 +90,7 @@ class ServerlessSSMPublish {
    */
   private initializeVariables(): void {
     if (!this.initialized) {
-      this.enabled = this.evaluateEnabled();
+      this.enabled = evaluateEnabled(this.serverless.service.custom, this.throwError.bind(this)); // tslint:disable-line:no-unsafe-any
 
       if (this.enabled) {
         const credentials = this.provider.getCredentials(); // tslint:disable-line:no-unsafe-any
@@ -106,7 +102,7 @@ class ServerlessSSMPublish {
         const credentialsWithRegion = { ...credentials, region: this.region };
         this.ssm = new this.provider.sdk.SSM(credentialsWithRegion); // tslint:disable-line:no-unsafe-any
 
-        this.params = this.validateParams();
+        this.params = validateParams(this.serverless.service.custom.ssmPublish, this.throwError.bind(this), this.log.bind(this)); // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
@@ -121,66 +117,6 @@ class ServerlessSSMPublish {
   }
 
   /**
-   * Determines whether this plugin should be enabled.
-   *
-   * This method reads the ssmPublish property "enabled" to see if this plugin should be enabled.
-   * If the property's value is undefined, a default value of true is assumed (for backwards compatibility).
-   * If the property's value is provided, this should be boolean, otherwise an exception is thrown.
-   */
-  private evaluateEnabled(): boolean {
-    if (!this.serverless.service.custom?.ssmPublish) {
-      this.throwError('Plugin configuration is missing.');
-    }
-
-    const enabled = this.serverless.service.custom.ssmPublish.enabled;
-    // const err = new Error(`Ambiguous value for "enabled": '${enabled}'`);
-
-    // Enabled by default
-    if (enabled === undefined) {
-      return true;
-    }
-
-    switch (typeof enabled) {
-      case 'boolean':
-        return enabled;
-      case 'string':
-        if (enabled === 'true') return true;
-        if (enabled === 'false') {
-          return false;
-        }
-        this.throwError(`Ambiguous value for "enabled": '${enabled}'`);
-        return false;
-      default:
-        this.throwError(`Ambiguous value for "enabled": '${enabled}'`);
-        return false;
-    }
-  }
-
-  /**
-   * Validates params passed in serverless.yaml
-   * Throws error if no params or incorrect syntax.
-   * Might want to call this in evaluateEnabled?
-   * Need to add some more validation here
-   */
-  private validateParams(): SSMParam[] | undefined {
-    if (!this.serverless.service?.custom?.ssmPublish?.params || !this.serverless.service?.custom?.ssmPublish?.params.length) {
-      this.throwError('No params defined');
-    }
-
-    const validateParam = (param: SSMParam) => {
-      if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey))) {
-        this.throwError('Path and Value are required fields for params');
-      }
-      if (typeof param.secure !== 'boolean') {
-        this.log(`Param at path ${param.path} should pass Secure as boolean value`);
-      }
-      return { ...param, Secure: !!param.secure };
-    };
-
-    return this.serverless.service.custom.ssmPublish.params?.map(validateParam);
-  }
-
-  /**
    * Checks whether parameters exist in SSM and if they've been changed
    * Stores arrays of changed/unchanged/new Parameters on class
    */
@@ -188,20 +124,9 @@ class ServerlessSSMPublish {
     if (!this.params) return;
     const retrievedParameters = await this.ssm.getParameters({ Names: this.params.map((param) => param.path), WithDecryption: true}).promise();
 
-    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = this.params.reduce< { nonExistingParams: SSMParam[]; existingChangedParams: SSMParam[]; existingUnchangedParams: SSMParam[] }>((acc, curr) => {
-      const existingParam = retrievedParameters.Parameters?.find((param) => param.Name === curr.path);
-      if (!existingParam) {
-        acc.nonExistingParams.push(curr);
-        return acc;
-      }
-      if (existingParam.Value === curr.value) {
-        acc.existingUnchangedParams.push(curr);
-        return acc;
-      }
-      acc.existingChangedParams.push(curr);
-      return acc;
-    }
-    , { nonExistingParams: [], existingChangedParams: [], existingUnchangedParams: [] });
+    if (retrievedParameters.InvalidParameters?.length) this.log(chalk.red(`Invalid Parameters present:\n\t${retrievedParameters.InvalidParameters.join('\n\t')}`));
+
+    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, retrievedParameters.Parameters);
 
     this.logIfDebug(`New param paths:\n\t${nonExistingParams.map((param) => param.path).join('\n\t')}`);
     this.logIfDebug(`Changed param paths:\n\t${existingChangedParams.map((param) => param.path).join('\n\t')}`);
@@ -219,14 +144,14 @@ class ServerlessSSMPublish {
     const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParam) => this.ssm.putParameter(
       {
         Name: param.path,
-        Description: `Placed by ${this.serverless.service.package.name} - serverless-ssm-plugin`,
+        Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
         Value: param.value,
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
       },
         ).promise(),
       ));
-    this.logIfDebug(`SSM Put Results: ${putResults.join('/n ')}`);
+    this.logIfDebug(`SSM Put Results:\n\t${putResults.join('\n\t')}`);
 }
 
   /**
