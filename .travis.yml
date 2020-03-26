@@ -20,7 +20,7 @@ jobs:
       script:
         - npm run test:coverage
         - echo "Report Coverage..."
-        - npm codecov
+        - npm run codecov
     - stage: publish
       name: "Publish to NPM"
       node_js: 'node'

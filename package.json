@@ -48,6 +48,7 @@
     "test": "jest",
     "test:build": "jest -c '{}' build",
     "test:coverage": "jest --coverage",
+    "codecov": "codecov",
     "preversion": "yarn lint && yarn build && yarn test:build && changelog-verify CHANGELOG.md",
     "version": "version-changelog CHANGELOG.md && changelog-verify CHANGELOG.md && git add CHANGELOG.md",
     "release": "cd build && npm publish",
