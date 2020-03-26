@@ -45,7 +45,7 @@
   "scripts": {
     "check:updates": "npx npm-check-updates",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
     "test:build": "jest -c '{}' build",
     "test:coverage": "jest --coverage",
     "preversion": "yarn lint && yarn build && yarn test:build && changelog-verify CHANGELOG.md",
