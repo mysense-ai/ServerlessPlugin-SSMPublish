@@ -4,7 +4,7 @@ node_js:
   - "node"
   - "lts/*"
 
-cache: npm
+cache: yarn
 
 # branches:
 #   only:
@@ -14,13 +14,13 @@ jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script: npm install
+      script: yarn
     - stage: test
       name: "Unit Tests + Coverage"
       script:
-        - npm run test:coverage
+        - yarn test:coverage
         - echo "Report Coverage..."
-        - npm run codecov
+        - yarn codecov
     - stage: publish
       name: "Build and publish to NPM"
       node_js: 'node'
@@ -29,9 +29,9 @@ jobs:
         skip_cleanup: true
         script:
           - echo "Building.."
-          - npm run build
+          - yarn build
           - echo "Publishing to NPM..."
-          - npm run semantic-release
+          - yarn semantic-release
         on:
           branch: master
 
