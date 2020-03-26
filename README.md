@@ -12,7 +12,10 @@ Publish custom data to AWS SSM Parameter Store from serverless.yaml.
 ## Install
 
 * Install with your choice of npm/yarn
-`npm install serverless-ssm-publish --save-dev`
+```
+npm install serverless-ssm-publish --save-dev
+yarn add serverless-ssm-publish --save-dev
+```
 * Add the plugin to your `plugins` section in the serverless.yaml
 ```yaml
 plugins:
