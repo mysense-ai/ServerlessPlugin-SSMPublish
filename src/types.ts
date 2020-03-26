@@ -53,7 +53,6 @@ export interface SSMParam {
 export interface ServerlessInstance {
   cli: {
     log(message: string, entity?: string): null;
-    consoleLog(str: any);            // tslint:disable-line:no-any
   };
   config: Config;
   providers: {

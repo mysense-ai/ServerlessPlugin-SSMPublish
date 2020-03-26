@@ -63,13 +63,11 @@ class ServerlessSSMPublish {
       'ssmPublish:upsertParams': this.hookWrapper.bind(this, this.updateParams.bind(this)),            // tslint:disable-line:no-unsafe-any
 
       // Serverless lifecycle events
-      'after:package:createDeploymentArtifacts': async () => { // check if this is the best place to call our plugin
+      'after:deploy:deploy': async () => { // check if this is the best place to call our plugin
         await this.hookWrapper.bind(this, this.getAndCheckParams.bind(this))();                        // tslint:disable-line:no-unsafe-any
         await this.hookWrapper.bind(this, this.updateParams.bind(this))();                             // tslint:disable-line:no-unsafe-any
         this.hookWrapper.bind(this, this.summary.bind(this))();                                        // tslint:disable-line:no-unsafe-any
       },
-      'after:deploy:deploy': this.hookWrapper.bind(this, this.summary.bind(this)),                     // tslint:disable-line:no-unsafe-any
-      'after:info:info': this.hookWrapper.bind(this, this.summary.bind(this)),                         // tslint:disable-line:no-unsafe-any
     };
   }
 
