@@ -6,6 +6,10 @@ node_js:
 
 cache: npm
 
+branches:
+  only:
+    - master
+
 jobs:
   include:
     - stage: install
@@ -14,9 +18,9 @@ jobs:
     - stage: test
       name: "Unit Tests + Coverage"
       script:
-        - npm test
+        - npm test:coverage
         - echo "Report Coverage..."
-        - npm run coveralls
+        - npm run codecov
     - stage: publish
       name: "Publish to NPM"
       node_js: 'node'
@@ -34,7 +38,8 @@ jobs:
 #          condition: -z $SKIP_PUBLISH
         provider: script
         skip_cleanup: true
-        script: npm run release
+        script: echo 'deploying to NPM'
+          # npm run build && npm run semantic-release
         on:
           tags: true
 
