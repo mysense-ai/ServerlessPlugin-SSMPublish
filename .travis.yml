@@ -6,9 +6,9 @@ node_js:
 
 cache: npm
 
-branches:
-  only:
-    - master
+# branches:
+#   only:
+#     - master
 
 jobs:
   include:
