@@ -31,6 +31,7 @@ jobs:
         - echo "Deploying..."
       deploy:
         provider: script
+        skip_cleanup: true # will be deprecated in dpl2
         script:
           - yarn semantic-release
         on:
