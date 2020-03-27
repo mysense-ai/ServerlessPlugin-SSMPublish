@@ -27,7 +27,7 @@ jobs:
       script: skip
       deploy:
         provider: script
-        # skip_cleanup: true // deprecated in preparation for dpl2 - cleanup is false by default now
+        skip_cleanup: true # will be deprecated in dpl2
         script:
           - echo "Building.."
           - yarn build:ci
