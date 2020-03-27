@@ -28,6 +28,8 @@ jobs:
       before_deploy:
         - echo "Building..."
         - yarn build:ci
+        - echo "Testing build..."
+        - yarn test:build
         - echo "Deploying..."
       deploy:
         provider: script
