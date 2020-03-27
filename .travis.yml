@@ -32,9 +32,9 @@ jobs:
           - echo "Building.."
           - yarn build:ci
           - echo "Publishing to NPM..."
-          - yarn semantic-release
-        on:
-          branch: master
+          - yarn semantic-release --dry-run
+        # on:
+        #   branch: master
 
 stages:
   - install

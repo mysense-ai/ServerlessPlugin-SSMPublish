@@ -39,7 +39,7 @@
   "main": "build/index.js",
   "module": "./build",
   "files": [
-    "lib",
+    "build",
     "src"
   ],
   "scripts": {
@@ -54,7 +54,7 @@
     "semantic-release": "semantic-release",
     "release": "cd build && npm publish",
     "build": "scripts/build.bash",
-    "build:ci": "yarn tsc"
+    "build:ci": "tsc"
   },
   "dependencies": {
     "chalk": "^3.0.0",
