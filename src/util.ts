@@ -42,8 +42,9 @@ export const evaluateEnabled = (serviceCustomBlock: ServerlessInstance['service'
  * Validates params passed in serverless.yaml
  * Throws error if no params or incorrect syntax.
  */
-export const validateParams = (ssmPublishSettings: ServerlessInstance['service']['custom']['ssmPublish'], throwFunction: (message) => void, logFunction: (message) => void): SSMParam[] | undefined => {
-    if (!ssmPublishSettings?.params || !ssmPublishSettings?.params.length) {
+export const validateParams = (serverlessService: ServerlessInstance['service'], throwFunction: (message) => void, logFunction: (message) => void): SSMParam[] | undefined => {
+    const params = serverlessService.custom?.ssmPublish?.params;
+    if (!params || !params.length) {
       throwFunction('No params defined');
     }
 
@@ -65,10 +66,20 @@ export const validateParams = (ssmPublishSettings: ServerlessInstance['service']
         throwFunction(`Param ${param.path} name doesn't match AWS constraints`);
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
+       /**
+        * We want to prefix with service name and env if we get a pure variable name
+        */
+
+      const customPrefix = serverlessService.custom?.ssmPublish?.customPrefix;
+
+      if (param.path.charAt(0) !== '/') param.path = customPrefix ?
+        `${serverlessService.custom?.ssmPublish?.customPrefix}/${param.path}` :
+        `/${serverlessService.getServiceName()}/${serverlessService.provider.stage}/${param.path}`;
+
       return { ...param, secure: param.secure === false ? false : true };
     };
 
-    return ssmPublishSettings.params?.map(validateParam);
+    return params?.map(validateParam);
   };
 
 /**

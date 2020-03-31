@@ -22,9 +22,12 @@ interface Config {
 
 interface Provider {
   region: string;
+  name: string;
+  stage: string;
 }
 
 interface Service {
+  name: string;
   provider: Provider;
   custom: {
     ssmPublish: SSMPublish;
@@ -39,6 +42,7 @@ interface Classes {
 interface SSMPublish {
   enabled: boolean | string | undefined;
   params: SSMParam[] | undefined;
+  customPrefix?: string;
 }
 
 export interface SSMParam {

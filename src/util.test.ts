@@ -30,64 +30,92 @@ describe('evaluateEnabled should correctly validate if the plugin is enabled', (
 });
 
 describe('validateParams should correctly validate user input', () => {
-
-  test('It should throw if no params are present', () => {
-    const mockData = { enabled: true };
-    const testValidate = () => validateParams(mockData as ServerlessInstance['service']['custom']['ssmPublish'], throwFunction, logFunction); // tslint:disable-line:no-object-literal-type-assertion
+    const serviceMock: ServerlessInstance['service'] = {
+      name: 'test',
+      provider: {
+        region: 'test',
+        name: 'test',
+        stage: 'test',
+      },
+      custom: {
+        ssmPublish: {
+          enabled: true,
+          params: [],
+         },
+      },
+      getServiceName: () => 'test',
+    };
+    test('It should throw if no params are present', () => {
+    const customMock = { ssmPublish: { enabled:  true, params: undefined}};
+    const mockData = { ...serviceMock, ...customMock};
+    const testValidate = () => validateParams(mockData as ServerlessInstance['service'], throwFunction, logFunction); // tslint:disable-line:no-object-literal-type-assertion
     expect(testValidate).toThrow('No params defined');
   });
 
-  test('It should throw if required fields are missing', () => {
-    const mockData = { enabled: true, params: [{ path: 'bblablabla'}] };
-    const testValidate = () => validateParams(mockData as ServerlessInstance['service']['custom']['ssmPublish'], throwFunction, logFunction); // tslint:disable-line:no-object-literal-type-assertion
+    test('It should throw if required fields are missing', () => {
+    const customMock = { custom: { ssmPublish: { enabled: true, params: [{ path: 'bblablabla'}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+    const testValidate = () => validateParams(mockData as ServerlessInstance['service'], throwFunction, logFunction); // tslint:disable-line:no-object-literal-type-assertion
     expect(testValidate).toThrow('Path and Value are required fields for params');
   });
 
-  test('It should throw if the param path breaks AWS namespace rules (aws/ssm start)', () => {
-    const mockData = { enabled: true, params: [{ path: 'aws/test/', value: 'test'}] };
+    test('It should throw if the param path breaks AWS namespace rules (aws/ssm start)', () => {
+    const customMock = { custom: { ssmPublish: { enabled: true, params: [{ path: 'aws/test/', value: 'test'}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const testValidate = () => validateParams(mockData, throwFunction, logFunction);
     expect(testValidate).toThrow(`Param aws/test/ name doesn't match AWS constraints`);
   });
 
-  test('It should throw if the param path breaks AWS namespace rules (illegal characters)', () => {
-    const mockData = { enabled: true, params: [{ path:  '/test/*__+23s', value: 'test'}] };
+    test('It should throw if the param path breaks AWS namespace rules (illegal characters)', () => {
+    const customMock = { custom: { ssmPublish: { enabled: true, params: [{ path:  '/test/*__+23s', value: 'test'}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const testValidate = () => validateParams(mockData, throwFunction, logFunction);
     expect(testValidate).toThrow(`Param /test/*__+23s name doesn't match AWS constraints`);
   });
 
-  test('It should throw if the param path breaks AWS namespace rules (max nesting depth)', () => {
-    const mockData = { enabled: true, params: [{ path:  '/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/', value: 'test'}] };
+    test('It should throw if the param path breaks AWS namespace rules (max nesting depth)', () => {
+    const customMock = { custom: { ssmPublish: { enabled: true, params: [{ path:  '/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/', value: 'test'}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const testValidate = () => validateParams(mockData, throwFunction, logFunction);
     expect(testValidate).toThrow(`Param /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/ name doesn't match AWS constraints`);
   });
 
-  test('It should throw if the param path breaks AWS namespace rules (max maxLength)', () => {
+    test('It should throw if the param path breaks AWS namespace rules (max maxLength)', () => {
     const maxNameLength = 1011;
-    const mockData = { enabled: true, params: [{ path:  'a'.repeat(maxNameLength + 1), value: 'test'}] };
+    const customMock = { custom: { ssmPublish:  { enabled: true, params: [{ path:  'a'.repeat(maxNameLength + 1), value: 'test'}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const testValidate = () => validateParams(mockData, throwFunction, logFunction);
     expect(testValidate).toThrow(`Param ${'a'.repeat(maxNameLength + 1)} name doesn't match AWS constraints`);
   });
 
-  test('It should throw if the param description breaks AWS validation rules (max maxLength)', () => {
+    test('It should throw if the param description breaks AWS validation rules (max maxLength)', () => {
     const maxNameLength = 1024;
-    const mockData = { enabled: true, params: [{ path:  'test', value: 'test', description: 'a'.repeat(maxNameLength + 1)}] };
+    const customMock = { custom: { ssmPublish: { enabled: true, params: [{ path:  'test', value: 'test', description: 'a'.repeat(maxNameLength + 1)}] }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const testValidate = () => validateParams(mockData, throwFunction, logFunction);
     expect(testValidate).toThrow(`Param test description is too long`);
   });
 
-  test('It should return valid input as expected (default secure to true)', () => {
-    const mockData = {
+    test('It should return valid input as expected (default secure to true)', () => {
+    const customMock = { custom: { ssmPublish: {
       enabled: true,
       params: [
-        { path: 'test/param', value: 'test'},
-        { path: 'test/param1', value: 'test', secure: false, description: 'valid'},
+        { path: '/test/param', value: 'test'},
+        { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
         { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
       ],
-    };
+    }}};
+    const mockData = { ...serviceMock, ...customMock};
+
     const expectedResult = [
-      { path: 'test/param', value: 'test', secure: true},
-      { path: 'test/param1', value: 'test', secure: false, description: 'valid'},
-      { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
+      { path: '/test/param', value: 'test', secure: true},
+      { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
+      { path: '/test/test/test/param2', value: 'test', secure: true, description: 'valid'},
     ];
     expect(validateParams(mockData, throwFunction, logFunction)).toStrictEqual(expectedResult);
   });

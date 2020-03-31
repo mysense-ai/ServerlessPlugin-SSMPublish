@@ -102,7 +102,7 @@ class ServerlessSSMPublish {
         const credentialsWithRegion = { ...credentials, region: this.region };
         this.ssm = new this.provider.sdk.SSM(credentialsWithRegion); // tslint:disable-line:no-unsafe-any
 
-        this.params = validateParams(this.serverless.service.custom.ssmPublish, this.throwError.bind(this), this.log.bind(this)); // tslint:disable-line:no-unsafe-any
+        this.params = validateParams(this.serverless.service, this.throwError.bind(this), this.log.bind(this)); // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
