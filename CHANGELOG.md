@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.0.2...v1.1.0) (2020-03-31)
+
+
+### Bug Fixes
+
+* remove automagical customPrefix setting ([736fef3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/736fef3161668c0043574b715ac4c832a365244b))
+
+
+### Features
+
+* add default prefix for non prefixed paths, custom prefix option ([7821e86](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/7821e8681d6479873dd0dec67be9c44c01e69c20))
+* add option to publish Cloud Formation Output to SSM ([d1283bd](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/d1283bd8a0d2ad199fb9a7023740abe97a6e727f))
+* improve granularity of control over CF output publishing ([437f02f](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/437f02f2ec44f68da08c56ef24d5394540c50ced))
+
 ## [1.0.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.0.1...v1.0.2) (2020-03-30)
 
 
