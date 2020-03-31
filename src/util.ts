@@ -78,22 +78,6 @@ export const validateParams = (params: ServerlessInstance['service']['custom']['
   };
 
 /**
- * We want to prefix with service name and env if we get an unqualified param path
- */
-
-export const addPathPrefix = (serverlessService: ServerlessInstance['service'], param: SSMParamWithValue): SSMParamWithValue => {
-  const customPrefix = serverlessService.custom?.ssmPublish?.customPrefix;
-
-  param.path = param.path.charAt(0) !== '/' ?
-    // path is not nested
-    param.path = customPrefix ?
-      `${serverlessService.custom?.ssmPublish?.customPrefix}${param.path}` :
-      `/${serverlessService.getServiceName()}/${serverlessService.provider.stage}/${param.path}` :
-    param.path;
-  return param;
-};
-
-/**
  * Helper function to compare values in sls.yaml and remote SSM
  */
 export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SSM.GetParametersResult['Parameters']) => localParams.reduce< { nonExistingParams: SSMParamWithValue[]; existingChangedParams: SSMParamWithValue[]; existingUnchangedParams: SSMParamWithValue[] }>((acc, curr) => {

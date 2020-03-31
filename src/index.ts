@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import * as util from 'util';
 
 import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue   } from './types';
-import { addPathPrefix, compareParams, evaluateEnabled, validateParams } from './util';
+import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
   'ap-east-1',    // Hong Kong - region disabled by default
@@ -136,12 +136,9 @@ class ServerlessSSMPublish {
           return { ...slsParam, value: foundCloudFormationParam.value};
         });
 
-        // Ensure path is qualified for all params
-        const yamlDefinedParamsWithQualifiedPaths = mergedParams.map((param) => addPathPrefix(this.serverless.service, param));
-
         // Put params on this for following logic
 
-        this.params = [...yamlDefinedParamsWithQualifiedPaths]; // tslint:disable-line:no-unsafe-any
+        this.params = [...mergedParams]; // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
