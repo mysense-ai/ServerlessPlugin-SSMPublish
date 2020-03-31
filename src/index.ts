@@ -1,7 +1,8 @@
-import { SSM } from 'aws-sdk';
+import { CloudFormation , SSM } from 'aws-sdk';
 import chalk from 'chalk';
+import * as util from 'util';
 
-import { ServerlessInstance, SSMParam } from './types';
+import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue   } from './types';
 import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
@@ -24,13 +25,15 @@ class ServerlessSSMPublish {
   // SSM Publish internal properties
   private initialized = false;
   private enabled: boolean;
+  private stackName: string;
 
   // SSM Publish custom variables
   private region: string;
-  private params: SSMParam[] | undefined;
-  private nonExistingParams: SSMParam[];
-  private existingChangedParams: SSMParam[];
-  private existingUnchangedParams: SSMParam[];
+  private params: SSMParamWithValue[];
+  private nonExistingParams: SSMParamWithValue[];
+  private existingChangedParams: SSMParamWithValue[];
+  private existingUnchangedParams: SSMParamWithValue[];
+  private cloudFormationOutput: SSMParamWithValue[] | undefined;
 
   /**
    * Constructor
@@ -76,7 +79,7 @@ class ServerlessSSMPublish {
    * @param lifecycleFunc lifecycle function that actually does desired action
    */
   public async hookWrapper(lifecycleFunc: any) {  // tslint:disable-line:no-any
-    this.initializeVariables();
+    await this.initializeVariables();
 
     if (!this.enabled) {
       this.log('serverless-ssm-publish: SSM Publish is disabled.');
@@ -88,7 +91,7 @@ class ServerlessSSMPublish {
   /**
    * Goes through custom ssm publish properties and initializes local variables.
    */
-  private initializeVariables(): void {
+  private async initializeVariables(): Promise<void> {
     if (!this.initialized) {
       this.enabled = evaluateEnabled(this.serverless.service.custom, this.throwError.bind(this)); // tslint:disable-line:no-unsafe-any
 
@@ -98,11 +101,44 @@ class ServerlessSSMPublish {
         // Extract plugin variables
         this.region = this.serverless.service.provider.region;
 
+        this.stackName = util.format('%s-%s',
+          this.serverless.service.getServiceName(),
+          this.serverless.getProvider('aws').getStage(),
+        );
+
         // Initialize AWS SDK clients
         const credentialsWithRegion = { ...credentials, region: this.region };
+
         this.ssm = new this.provider.sdk.SSM(credentialsWithRegion); // tslint:disable-line:no-unsafe-any
 
-        this.params = validateParams(this.serverless.service.custom.ssmPublish, this.throwError.bind(this), this.log.bind(this)); // tslint:disable-line:no-unsafe-any
+        // Validate plugin variables
+
+        const yamlDefinedParams = validateParams(this.serverless.service.custom.ssmPublish.params, this.throwError.bind(this), this.log.bind(this)) || []; // tslint:disable-line:no-unsafe-any
+
+        // Retrieve Cloud Formation output if necessary
+        if (yamlDefinedParams.some((param: SSMParamCloudFormation) => param.source)) {
+          this.logIfDebug('Retrieving Cloud Formation Outputs');
+          this.cloudFormationOutput = await this.retrieveAndFormatCloudFormationOutput();
+        }
+
+        // Merge cloud formation output with yaml defined values
+        const checkIfParamHasValue = (param: SSMParam): param is SSMParamWithValue => param.hasOwnProperty('value');
+
+        const mergedParams = yamlDefinedParams.map((slsParam): SSMParamWithValue => {
+          if (checkIfParamHasValue(slsParam)) return slsParam;
+
+          const foundCloudFormationParam = this.cloudFormationOutput?.find((cloudFormationParam) => cloudFormationParam.path === slsParam.source);
+
+          if (!foundCloudFormationParam) {
+            this.throwError(`No Cloud Formation Output found for source ${slsParam.source}`);
+            throw new Error(`No Cloud Formation Output found for source ${slsParam.source}`); // Throwing again as typescript won't recognise throwError as throwing
+          }
+          return { ...slsParam, value: foundCloudFormationParam.value};
+        });
+
+        // Put params on this for following logic
+
+        this.params = [...mergedParams]; // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
@@ -124,7 +160,7 @@ class ServerlessSSMPublish {
     if (!this.params) return;
     const retrievedParameters = await this.ssm.getParameters({ Names: this.params.map((param) => param.path), WithDecryption: true}).promise();
 
-    if (retrievedParameters.InvalidParameters?.length) this.log(chalk.red(`Invalid Parameters present:\n\t${retrievedParameters.InvalidParameters.join('\n\t')}`));
+    if (retrievedParameters.InvalidParameters?.length) this.log(chalk.yellow(`New or invalid parameters present:\n\t${retrievedParameters.InvalidParameters.join('\n\t')}`));
 
     const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, retrievedParameters.Parameters);
 
@@ -141,7 +177,7 @@ class ServerlessSSMPublish {
    * Makes putParameter request for all changed/new parameters
    */
   private async updateParams() {
-    const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParam) => this.ssm.putParameter(
+    const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParamWithValue) => this.ssm.putParameter(
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
@@ -153,6 +189,41 @@ class ServerlessSSMPublish {
       ));
     this.logIfDebug(`SSM Put Results:\n\t${putResults.join('\n\t')}`);
 }
+  private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParamWithValue[]> {
+    const stackResult = await this.fetchCFOutput();
+
+    const outputForSSM = this.prettifyCFOutput(stackResult);
+
+    return outputForSSM;
+  }
+
+  private async fetchCFOutput(): Promise<CloudFormation.DescribeStacksOutput> {
+    return this.serverless.getProvider('aws').request(
+      'CloudFormation',
+      'describeStacks',
+      { StackName: this.stackName },
+      this.serverless.getProvider('aws').getStage(),
+      this.serverless.getProvider('aws').getRegion(),
+    );
+  }
+
+  private prettifyCFOutput(stackResult: CloudFormation.DescribeStacksOutput): SSMParamWithValue[] {
+    if (!stackResult.Stacks) return [];
+
+    const stackOutput = stackResult.Stacks[0].Outputs;
+
+    if (!stackOutput) return [];
+
+    const formattedParams = stackOutput
+      // ensure output matches our formatting
+      .map((output) => ({
+      path: output.OutputKey || '',
+      value: output.OutputValue || '',
+      description: output.Description,
+    }));
+
+    return formattedParams || [];
+  }
 
   /**
    * Logs message with prefix

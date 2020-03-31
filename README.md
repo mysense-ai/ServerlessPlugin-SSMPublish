@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.com/mysense-ai/ServerlessPlugin-SSMPublish.svg?branch=master)](https://travis-ci.com/mysense-ai/ServerlessPlugin-SSMPublish)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-Publish custom data to AWS SSM Parameter Store from serverless.yaml.
+Publish custom data to AWS SSM Parameter Store from serverless.yaml or Cloud Formation Output
 
 ## Install
 
@@ -27,9 +27,18 @@ plugins:
 ### During deployment
 
 Add any params you want published to SSM to your serverless.yaml custom section.
+You can use `source` to give the name of a Cloud Formation Output value you want published to SSM.
 Ssm publish compares existing values and will only write if no value exists/ the value has changed.
 
 ```yaml
+resources:
+  Outputs:
+    ExampleStaticValue:
+      Value: example-static-value
+      Export:
+        Name: 'service-staticValue'
+      Description: initial description
+
 custom:
   secretToken: ${opt:secretToken}
 
@@ -41,7 +50,7 @@ custom:
         description: Super Secret Token       # description is optional
         secure: true                          # defaults to true
       - path: /service/config/storageBucket
-        value: !Ref StorageBucket
+        source: ExampleStaticValue            # source can be used as an alternative to value. If source is given, ssmPublish will retrieve the matching value from the service's Cloud Formation Output
         secure: false
 ```
 

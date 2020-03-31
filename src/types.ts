@@ -1,10 +1,12 @@
 declare class AwsProvider {
+
   constructor(serverless: ServerlessInstance, options: Options)
 
   public getProviderName(): string;
   public getRegion(): string;
   public getServerlessDeploymentBucketName(): string;
   public getStage(): string;
+  public request(service: string, method: string, data: { }, stage: string, region: string): Promise<any>; // tslint:disable-line:no-any
 }
 
 interface Options {
@@ -22,9 +24,12 @@ interface Config {
 
 interface Provider {
   region: string;
+  name: string;
+  stage: string;
 }
 
 interface Service {
+  name: string;
   provider: Provider;
   custom: {
     ssmPublish: SSMPublish;
@@ -39,14 +44,24 @@ interface Classes {
 interface SSMPublish {
   enabled: boolean | string | undefined;
   params: SSMParam[] | undefined;
+  customPrefix?: string;
+  publishCloudFormationExports?: boolean;
 }
 
-export interface SSMParam {
+export interface BaseSSMParam {
   path: string;
-  value: string;
   description?: string;
   secure?: boolean;
 }
+export interface SSMParamCloudFormation extends BaseSSMParam {
+  source: string;
+}
+
+export interface SSMParamWithValue extends BaseSSMParam {
+  value: string;
+}
+
+export type SSMParam = SSMParamWithValue | SSMParamCloudFormation;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
