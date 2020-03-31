@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.0.1...v1.0.2) (2020-03-30)
+
+
+### Bug Fixes
+
+* fix typo in semantic-release settings to publish changelog ([bcc191a](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/bcc191a6267ae15cc07b3a500ee83c233d347b11))
+
 # Changelog
 All notable changes to this project will be documented in this file.
 
