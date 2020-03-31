@@ -35,7 +35,7 @@ custom:
 
   ssmPublish:
     enabled: true                             # Needs to be set to true
-    customPrefix: 'string';                    # optional - if not provided, param.paths that aren't nested will be nested as /serviceName/serviceStage/ (taken from sls.yaml)
+    customPrefix: 'string';                   # optional - if not provided, param.paths that aren't nested will be nested as /serviceName/serviceStage/ (taken from sls.yaml)
     publishCloudFormationOutput: boolean;     # optional - exports Cloudformation outputs to SSM using customPrefix or default value
 
     params:
