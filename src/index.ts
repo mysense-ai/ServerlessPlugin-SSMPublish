@@ -117,8 +117,6 @@ class ServerlessSSMPublish {
           .map((param) => ({ ...param, path: addPathPrefix(this.serverless.service, param)})) : // tslint:disable-line:no-unsafe-any
          [];
 
-        this.log(chalk.green(JSON.stringify(cloudFormationOutputParams)));
-
         this.params = [...yamlDefinedParams, ...cloudFormationOutputParams]; // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
@@ -172,8 +170,6 @@ class ServerlessSSMPublish {
 }
   private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParam[]> {
     const stackResult = await this.fetchCFOutput();
-
-    this.log(chalk.red(JSON.stringify(stackResult)));
 
     const outputForSSM = this.prettifyCFOutput(stackResult);
 
