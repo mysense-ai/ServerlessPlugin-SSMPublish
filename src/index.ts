@@ -2,7 +2,7 @@ import { CloudFormation , SSM } from 'aws-sdk';
 import chalk from 'chalk';
 import * as util from 'util';
 
-import { ServerlessInstance, SSMParam } from './types';
+import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue   } from './types';
 import { addPathPrefix, compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
@@ -29,10 +29,11 @@ class ServerlessSSMPublish {
 
   // SSM Publish custom variables
   private region: string;
-  private params: SSMParam[] | undefined;
-  private nonExistingParams: SSMParam[];
-  private existingChangedParams: SSMParam[];
-  private existingUnchangedParams: SSMParam[];
+  private params: SSMParamWithValue[];
+  private nonExistingParams: SSMParamWithValue[];
+  private existingChangedParams: SSMParamWithValue[];
+  private existingUnchangedParams: SSMParamWithValue[];
+  private cloudFormationOutput: SSMParamWithValue[] | undefined;
 
   /**
    * Constructor
@@ -110,14 +111,37 @@ class ServerlessSSMPublish {
 
         this.ssm = new this.provider.sdk.SSM(credentialsWithRegion); // tslint:disable-line:no-unsafe-any
 
-        const yamlDefinedParams = validateParams(this.serverless.service, this.throwError.bind(this), this.log.bind(this)) || []; // tslint:disable-line:no-unsafe-any
+        // Validate plugin variables
 
-        const cloudFormationOutputParams = this.serverless.service.custom.ssmPublish.publishCloudFormationOutput ?
-         (await this.retrieveAndFormatCloudFormationOutput())
-          .map((param) => ({ ...param, path: addPathPrefix(this.serverless.service, param)})) : // tslint:disable-line:no-unsafe-any
-         [];
+        const yamlDefinedParams = validateParams(this.serverless.service.custom.ssmPublish.params, this.throwError.bind(this), this.log.bind(this)) || []; // tslint:disable-line:no-unsafe-any
 
-        this.params = [...yamlDefinedParams, ...cloudFormationOutputParams]; // tslint:disable-line:no-unsafe-any
+        // Retrieve Cloud Formation output if necessary
+        if (yamlDefinedParams.some((param: SSMParamCloudFormation) => param.source)) {
+          this.logIfDebug('Retrieving Cloud Formation Outputs');
+          this.cloudFormationOutput = await this.retrieveAndFormatCloudFormationOutput();
+        }
+
+        // Merge cloud formation output with yaml defined values
+        const checkIfParamHasValue = (param: SSMParam): param is SSMParamWithValue => param.hasOwnProperty('value');
+
+        const mergedParams = yamlDefinedParams.map((slsParam): SSMParamWithValue => {
+          if (checkIfParamHasValue(slsParam)) return slsParam;
+
+          const foundCloudFormationParam = this.cloudFormationOutput?.find((cloudFormationParam) => cloudFormationParam.path === slsParam.source);
+
+          if (!foundCloudFormationParam) {
+            this.throwError(`No Cloud Formation Output found for source ${slsParam.source}`);
+            throw new Error(`No Cloud Formation Output found for source ${slsParam.source}`); // Throwing again as typescript won't recognise throwError as throwing
+          }
+          return { ...slsParam, value: foundCloudFormationParam.value};
+        });
+
+        // Ensure path is qualified for all params
+        const yamlDefinedParamsWithQualifiedPaths = mergedParams.map((param) => addPathPrefix(this.serverless.service, param));
+
+        // Put params on this for following logic
+
+        this.params = [...yamlDefinedParamsWithQualifiedPaths]; // tslint:disable-line:no-unsafe-any
 
         unsupportedRegionPrefixes.forEach((unsupportedRegionPrefix) => {
           if (this.region.startsWith(unsupportedRegionPrefix)) {
@@ -156,7 +180,7 @@ class ServerlessSSMPublish {
    * Makes putParameter request for all changed/new parameters
    */
   private async updateParams() {
-    const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParam) => this.ssm.putParameter(
+    const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParamWithValue) => this.ssm.putParameter(
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
@@ -168,7 +192,7 @@ class ServerlessSSMPublish {
       ));
     this.logIfDebug(`SSM Put Results:\n\t${putResults.join('\n\t')}`);
 }
-  private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParam[]> {
+  private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParamWithValue[]> {
     const stackResult = await this.fetchCFOutput();
 
     const outputForSSM = this.prettifyCFOutput(stackResult);
@@ -186,7 +210,7 @@ class ServerlessSSMPublish {
     );
   }
 
-  private prettifyCFOutput(stackResult: CloudFormation.DescribeStacksOutput): SSMParam[] {
+  private prettifyCFOutput(stackResult: CloudFormation.DescribeStacksOutput): SSMParamWithValue[] {
     if (!stackResult.Stacks) return [];
 
     const stackOutput = stackResult.Stacks[0].Outputs;
@@ -194,14 +218,11 @@ class ServerlessSSMPublish {
     if (!stackOutput) return [];
 
     const formattedParams = stackOutput
-      // remove the standard CF Outputs
-      .filter((output) => output.ExportName !== 'HandlerLambdaFunctionQualifiedArn' && output.ExportName !== 'ServerlessDeploymentBucketName')
       // ensure output matches our formatting
       .map((output) => ({
       path: output.OutputKey || '',
       value: output.OutputValue || '',
       description: output.Description,
-      secure: true,
     }));
 
     return formattedParams || [];

@@ -45,15 +45,23 @@ interface SSMPublish {
   enabled: boolean | string | undefined;
   params: SSMParam[] | undefined;
   customPrefix?: string;
-  publishCloudFormationOutput?: boolean;
+  publishCloudFormationExports?: boolean;
 }
 
-export interface SSMParam {
+export interface BaseSSMParam {
   path: string;
-  value: string;
   description?: string;
   secure?: boolean;
 }
+export interface SSMParamCloudFormation extends BaseSSMParam {
+  source: string;
+}
+
+export interface SSMParamWithValue extends BaseSSMParam {
+  value: string;
+}
+
+export type SSMParam = SSMParamWithValue | SSMParamCloudFormation;
 
 // ---------------------------------------------------------------------------------------------------------------------
 

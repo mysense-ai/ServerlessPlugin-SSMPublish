@@ -1,7 +1,7 @@
 import { SSM } from 'aws-sdk';
 import chalk from 'chalk';
 
-import { ServerlessInstance, SSMParam } from './types';
+import { ServerlessInstance, SSMParam, SSMParamWithValue } from './types';
 
 /**
  * Determines whether this plugin should be enabled.
@@ -42,18 +42,22 @@ export const evaluateEnabled = (serviceCustomBlock: ServerlessInstance['service'
  * Validates params passed in serverless.yaml
  * Throws error if no params or incorrect syntax.
  */
-export const validateParams = (serverlessService: ServerlessInstance['service'], throwFunction: (message) => void, logFunction: (message) => void): SSMParam[] | undefined => {
-    const params = serverlessService.custom?.ssmPublish?.params;
+export const validateParams = (params: ServerlessInstance['service']['custom']['ssmPublish']['params'], throwFunction: (message) => void, logFunction: (message) => void): SSMParam[] => {
     if (!params || !params.length) {
       throwFunction('No params defined');
+      throw new Error('only here for typescript'); // typescript doesn't recognise that throwFunction above throws
     }
 
-    const validateParam = (param: SSMParam) => {
+    const validateParam = (param: SSMParamWithValue) => {
       const maxNameLength = 1011; // needs to account for ARN stuff being added
       const maxDescriptionLength = 1024;
       const maxDepth = 15;
-      if (!['path', 'value'].every((requiredKey: string) => Object.keys(param).includes(requiredKey)))
-        throwFunction('Path and Value are required fields for params');
+      const paramKeys = Object.keys(param);
+      if (
+        !paramKeys.includes('path') ||
+        ['value', 'source'].every((requiredKey: string) => paramKeys.includes(requiredKey)) ||
+        !['value', 'source'].some((requiredKey: string) => paramKeys.includes(requiredKey)))
+      throwFunction('path and either value or source are required fields for params');
       if (param.secure && typeof param.secure !== 'boolean') { // tslint:disable-line:strict-type-predicates
         logFunction(chalk.redBright(`Param at path ${param.path} should pass secure as boolean value`));
       }
@@ -67,34 +71,32 @@ export const validateParams = (serverlessService: ServerlessInstance['service'],
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
 
-       /**
-        * We want to prefix with service name and env if we get a pure variable name
-        */
-
-      param.path = addPathPrefix(serverlessService, param);
-
       return { ...param, secure: param.secure === false ? false : true };
     };
 
-    return params?.map(validateParam);
+    return params.map(validateParam);
   };
 
-export const addPathPrefix = (serverlessService: ServerlessInstance['service'], param: SSMParam): SSMParam['path'] => {
+/**
+ * We want to prefix with service name and env if we get an unqualified param path
+ */
+
+export const addPathPrefix = (serverlessService: ServerlessInstance['service'], param: SSMParamWithValue): SSMParamWithValue => {
   const customPrefix = serverlessService.custom?.ssmPublish?.customPrefix;
 
-  return param.path.charAt(0) !== '/' ?
+  param.path = param.path.charAt(0) !== '/' ?
     // path is not nested
     param.path = customPrefix ?
       `${serverlessService.custom?.ssmPublish?.customPrefix}${param.path}` :
       `/${serverlessService.getServiceName()}/${serverlessService.provider.stage}/${param.path}` :
     param.path;
-
+  return param;
 };
 
 /**
  * Helper function to compare values in sls.yaml and remote SSM
  */
-export const compareParams = (localParams: SSMParam[], remoteParams: SSM.GetParametersResult['Parameters']) => localParams.reduce< { nonExistingParams: SSMParam[]; existingChangedParams: SSMParam[]; existingUnchangedParams: SSMParam[] }>((acc, curr) => {
+export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SSM.GetParametersResult['Parameters']) => localParams.reduce< { nonExistingParams: SSMParamWithValue[]; existingChangedParams: SSMParamWithValue[]; existingUnchangedParams: SSMParamWithValue[] }>((acc, curr) => {
 
   const existingParam = remoteParams?.find((param) => param.Name === curr.path);
   if (!existingParam) {
