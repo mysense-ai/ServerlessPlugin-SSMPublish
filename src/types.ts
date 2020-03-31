@@ -45,7 +45,7 @@ interface SSMPublish {
   enabled: boolean | string | undefined;
   params: SSMParam[] | undefined;
   customPrefix?: string;
-  publishCloudFormationOutput?: string;
+  publishCloudFormationOutput?: boolean;
 }
 
 export interface SSMParam {
