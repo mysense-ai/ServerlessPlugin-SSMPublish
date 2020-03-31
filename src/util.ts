@@ -66,21 +66,30 @@ export const validateParams = (serverlessService: ServerlessInstance['service'],
         throwFunction(`Param ${param.path} name doesn't match AWS constraints`);
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
+
        /**
         * We want to prefix with service name and env if we get a pure variable name
         */
 
-      const customPrefix = serverlessService.custom?.ssmPublish?.customPrefix;
-
-      if (param.path.charAt(0) !== '/') param.path = customPrefix ?
-        `${serverlessService.custom?.ssmPublish?.customPrefix}/${param.path}` :
-        `/${serverlessService.getServiceName()}/${serverlessService.provider.stage}/${param.path}`;
+      param.path = addPathPrefix(serverlessService, param);
 
       return { ...param, secure: param.secure === false ? false : true };
     };
 
     return params?.map(validateParam);
   };
+
+export const addPathPrefix = (serverlessService: ServerlessInstance['service'], param: SSMParam): SSMParam['path'] => {
+  const customPrefix = serverlessService.custom?.ssmPublish?.customPrefix;
+
+  return param.path.charAt(0) !== '/' ?
+    // path is not nested
+    param.path = customPrefix ?
+      `${serverlessService.custom?.ssmPublish?.customPrefix}${param.path}` :
+      `/${serverlessService.getServiceName()}/${serverlessService.provider.stage}/${param.path}` :
+    param.path;
+
+};
 
 /**
  * Helper function to compare values in sls.yaml and remote SSM
