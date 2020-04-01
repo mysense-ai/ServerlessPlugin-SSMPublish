@@ -155,14 +155,31 @@ class ServerlessSSMPublish {
   /**
    * Checks whether parameters exist in SSM and if they've been changed
    * Stores arrays of changed/unchanged/new Parameters on class
+   * We need to account for SSM.GetParameters taking a max of 10 names
    */
   private async getAndCheckParams() {
     if (!this.params) return;
-    const retrievedParameters = await this.ssm.getParameters({ Names: this.params.map((param) => param.path), WithDecryption: true}).promise();
 
-    if (retrievedParameters.InvalidParameters?.length) this.log(chalk.yellow(`New or invalid parameters present:\n\t${retrievedParameters.InvalidParameters.join('\n\t')}`));
+    const chunkArray = ((array: SSMParam[], arraySize: number): SSMParam[][] => {
+      const arrayChunks: SSMParam[][] = [];
+      for (let i = 0; i < array.length; i += arraySize) {
+        arrayChunks.push(array.slice(i, arraySize + i));
+      }
+      return arrayChunks;
+    });
 
-    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, retrievedParameters.Parameters);
+    const getParameters = async (params: SSMParam[]) => this.ssm.getParameters({ Names: params.map((param) => param.path), WithDecryption: true}).promise();
+
+    const paramsToCheck = chunkArray(this.params, 10); // tslint:disable-line:no-magic-numbers
+
+    const retrievedParameterArray = await Promise.all(paramsToCheck.map(async (paramGroup: SSMParam[]) => getParameters(paramGroup)));
+
+    const foundParams = retrievedParameterArray.map((result) => result.Parameters).reduce((acc, curr) => [...acc ? acc : [], ...curr ? curr : []], []);
+    const invalidOrNewParams = retrievedParameterArray.map((result) => result.InvalidParameters).reduce((acc, curr) => [...acc ? acc : [], ...curr ? curr : []], []);
+
+    if (invalidOrNewParams?.length) this.log(chalk.yellow(`New or invalid parameters present:\n\t${invalidOrNewParams.join('\n\t')}`));
+
+    const { nonExistingParams, existingChangedParams, existingUnchangedParams } = compareParams(this.params, foundParams);
 
     this.logIfDebug(`New param paths:\n\t${nonExistingParams.map((param) => param.path).join('\n\t')}`);
     this.logIfDebug(`Changed param paths:\n\t${existingChangedParams.map((param) => param.path).join('\n\t')}`);
@@ -171,6 +188,7 @@ class ServerlessSSMPublish {
     this.nonExistingParams = nonExistingParams;
     this.existingChangedParams = existingChangedParams;
     this.existingUnchangedParams = existingUnchangedParams;
+
 }
 
   /**
