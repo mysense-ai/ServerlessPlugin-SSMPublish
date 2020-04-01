@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.0...v1.1.1) (2020-04-01)
+
+
+### Bug Fixes
+
+* account for SSM.GetParameters only taking max 10 names as input ([e3dea89](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/e3dea896abf4fcfd0e2f47e22304749e03057958))
+
 # [1.1.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.0.2...v1.1.0) (2020-03-31)
 
 ### Features
