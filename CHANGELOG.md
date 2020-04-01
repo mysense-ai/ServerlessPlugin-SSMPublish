@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.1...v1.1.2) (2020-04-01)
+
+
+### Bug Fixes
+
+* ensure cloud formation description is respected if existing ([13064d0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/13064d0d108839423e42740097451262ea85b5cd))
+
 ## [1.1.1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.0...v1.1.1) (2020-04-01)
 
 
