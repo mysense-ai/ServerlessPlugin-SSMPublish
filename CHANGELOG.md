@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.2...v1.1.3) (2020-04-01)
+
+
+### Bug Fixes
+
+* downgrade minimum Node version to 10 ([7324bea](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/7324bea1380f5eda7d1c7fffed6ecfccedf10bdb))
+
 ## [1.1.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.1...v1.1.2) (2020-04-01)
 
 
