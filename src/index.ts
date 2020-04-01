@@ -133,7 +133,7 @@ class ServerlessSSMPublish {
             this.throwError(`No Cloud Formation Output found for source ${slsParam.source}`);
             throw new Error(`No Cloud Formation Output found for source ${slsParam.source}`); // Throwing again as typescript won't recognise throwError as throwing
           }
-          return { ...slsParam, value: foundCloudFormationParam.value};
+          return { ...slsParam, value: foundCloudFormationParam.value, description: foundCloudFormationParam.description || slsParam.description };
         });
 
         // Put params on this for following logic
