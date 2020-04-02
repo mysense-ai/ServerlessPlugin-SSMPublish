@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.3...v1.1.4) (2020-04-02)
+
+
+### Bug Fixes
+
+* allow param `value` to be `string | object` ([629eaaa](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/629eaaa9f20273aaa6d370d00ed8e39b329ea73e))
+
 ## [1.1.3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.2...v1.1.3) (2020-04-01)
 
 
