@@ -87,7 +87,7 @@ export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SS
     acc.nonExistingParams.push(curr);
     return acc;
   }
-  if (existingParam.Value === curr.value) {
+  if (existingParam.Value === (typeof curr.value === 'string' ? curr.value : JSON.stringify(curr.value))) {
     acc.existingUnchangedParams.push(curr);
     return acc;
   }

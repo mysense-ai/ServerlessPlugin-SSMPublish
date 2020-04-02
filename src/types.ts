@@ -58,7 +58,7 @@ export interface SSMParamCloudFormation extends BaseSSMParam {
 }
 
 export interface SSMParamWithValue extends BaseSSMParam {
-  value: string;
+  value: string | object;
 }
 
 export type SSMParam = SSMParamWithValue | SSMParamCloudFormation;

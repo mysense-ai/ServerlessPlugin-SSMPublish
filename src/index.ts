@@ -216,7 +216,7 @@ class ServerlessSSMPublish {
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
-        Value: param.value,
+        Value: typeof param.value === 'string' ? param.value : JSON.stringify(param.value),
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
       },
