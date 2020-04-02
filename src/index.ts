@@ -1,8 +1,9 @@
-import { CloudFormation , SSM } from 'aws-sdk';
+import { CloudFormation, SSM } from 'aws-sdk';
 import chalk from 'chalk';
+import yaml from 'js-yaml';
 import * as util from 'util';
 
-import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue   } from './types';
+import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue } from './types';
 import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const unsupportedRegionPrefixes = [
@@ -35,10 +36,27 @@ class ServerlessSSMPublish {
   private existingUnchangedParams: SSMParamWithValue[];
   private cloudFormationOutput: SSMParamWithValue[] | undefined;
 
+  private static prettifyCFOutput(stackResult: CloudFormation.DescribeStacksOutput): SSMParamWithValue[] {
+    if (!stackResult.Stacks) return [];
+
+    const stackOutput = stackResult.Stacks[0].Outputs;
+
+    if (!stackOutput) return [];
+
+    const formattedParams = stackOutput
+      // ensure output matches our formatting
+      .map((output) => ({
+      path: output.OutputKey || '',
+      value: output.OutputValue || '',
+      description: output.Description,
+    }));
+
+    return formattedParams || [];
+  }
+
   /**
    * Constructor
    * @param serverless
-   * @param options
    */
   constructor(serverless: ServerlessInstance) {
     this.serverless = serverless;
@@ -199,7 +217,7 @@ class ServerlessSSMPublish {
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
-        Value: param.value,
+        Value: typeof param.value === 'string' ? param.value : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
       },
@@ -209,10 +227,7 @@ class ServerlessSSMPublish {
 }
   private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParamWithValue[]> {
     const stackResult = await this.fetchCFOutput();
-
-    const outputForSSM = this.prettifyCFOutput(stackResult);
-
-    return outputForSSM;
+    return ServerlessSSMPublish.prettifyCFOutput(stackResult);
   }
 
   private async fetchCFOutput(): Promise<CloudFormation.DescribeStacksOutput> {
@@ -223,24 +238,6 @@ class ServerlessSSMPublish {
       this.serverless.getProvider('aws').getStage(),
       this.serverless.getProvider('aws').getRegion(),
     );
-  }
-
-  private prettifyCFOutput(stackResult: CloudFormation.DescribeStacksOutput): SSMParamWithValue[] {
-    if (!stackResult.Stacks) return [];
-
-    const stackOutput = stackResult.Stacks[0].Outputs;
-
-    if (!stackOutput) return [];
-
-    const formattedParams = stackOutput
-      // ensure output matches our formatting
-      .map((output) => ({
-      path: output.OutputKey || '',
-      value: output.OutputValue || '',
-      description: output.Description,
-    }));
-
-    return formattedParams || [];
   }
 
   /**

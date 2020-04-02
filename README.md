@@ -42,15 +42,30 @@ resources:
 custom:
   secretToken: ${opt:secretToken}
 
+  someConfiguration:
+    foo: bar
+    baz: 1
+    more:
+      - stuff
+      - here
+
   ssmPublish:
-    enabled: true                             # Needs to be set to true
+    enabled: true                                # Needs to be set to true
     params:
+      # simple usage, `value` is a string
       - path: /global/tokens/secretToken
         value: ${self:custom.secretToken}
-        description: Super Secret Token       # description is optional
-        secure: true                          # defaults to true
+        description: Super Secret Token          # description is optional
+        secure: true                             # defaults to true
+
+      # `value` can be an object; it is serialized to YAML before upload to SSM
+      - path: /global/tokens/secretToken
+        value: ${self:custom.someConfiguration}
+
+      # `source` can be used as an alternative to `value`. If `source` is given, ssmPublish will retrieve
+      # the matching value from the service's CloudFormation Stack Outputs
       - path: /service/config/storageBucket
-        source: ExampleStaticValue            # source can be used as an alternative to value. If source is given, ssmPublish will retrieve the matching value from the service's Cloud Formation Output
+        source: ExampleStaticValue
         secure: false
 ```
 
@@ -61,7 +76,3 @@ You can also call the plugin directly in order to update SSM params without runn
 `sls ssmPublish`
 
 ## [Changelog](./CHANGELOG.md)
-
-## Version History
-*0.1.0
-  - Initial release
