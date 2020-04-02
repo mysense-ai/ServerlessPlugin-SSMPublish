@@ -76,7 +76,3 @@ You can also call the plugin directly in order to update SSM params without runn
 `sls ssmPublish`
 
 ## [Changelog](./CHANGELOG.md)
-
-## Version History
-*0.1.0
-  - Initial release
