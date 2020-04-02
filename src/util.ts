@@ -88,10 +88,25 @@ export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SS
     acc.nonExistingParams.push(curr);
     return acc;
   }
-  if (existingParam.Value === (typeof curr.value === 'string' ? curr.value : yaml.safeDump(curr.value))) {
-    acc.existingUnchangedParams.push(curr);
-    return acc;
+
+  // Compare unchanged
+  if (typeof curr.value === 'string') {
+    // Simple string comparison
+    if (existingParam.Value === curr.value) {
+      acc.existingUnchangedParams.push(curr);
+      return acc;
+    }
+  } else {
+    // Can't rely on serialized YAML string to be the same as the original definition.
+    // We therefore parse it & do quick-n-dirty deep object comparison via JSON.stringify
+    const parsedExisting = yaml.safeLoad(existingParam.Value);
+    if (JSON.stringify(parsedExisting) === JSON.stringify(curr.value)) {
+      acc.existingUnchangedParams.push(curr);
+      return acc;
+    }
   }
+
+  // Compare changed
   acc.existingChangedParams.push(curr);
   return acc;
 }
