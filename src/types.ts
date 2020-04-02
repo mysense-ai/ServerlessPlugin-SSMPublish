@@ -2,9 +2,9 @@ declare class AwsProvider {
 
   constructor(serverless: ServerlessInstance, options: Options)
 
-  public getProviderName(): string;
+  // public getProviderName(): string;
   public getRegion(): string;
-  public getServerlessDeploymentBucketName(): string;
+  // public getServerlessDeploymentBucketName(): string;
   public getStage(): string;
   public request(service: string, method: string, data: { }, stage: string, region: string): Promise<any>; // tslint:disable-line:no-any
 }

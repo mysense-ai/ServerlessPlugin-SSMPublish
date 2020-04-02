@@ -71,7 +71,7 @@ export const validateParams = (params: ServerlessInstance['service']['custom']['
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
 
-      return { ...param, secure: param.secure === false ? false : true };
+      return { ...param, secure: param.secure !== false };
     };
 
     return params.map(validateParam);
