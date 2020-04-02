@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.4...v1.1.5) (2020-04-02)
+
+
+### Bug Fixes
+
+* serialized YAML does not match original YAML definition ([5c43a75](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/5c43a75cbda8d5a99e9e34eb8300ce9abdde2d41))
+
 ## [1.1.4](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.3...v1.1.4) (2020-04-02)
 
 
