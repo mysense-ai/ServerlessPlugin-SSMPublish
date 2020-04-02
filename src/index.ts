@@ -1,5 +1,6 @@
 import { CloudFormation, SSM } from 'aws-sdk';
 import chalk from 'chalk';
+import yaml from 'js-yaml';
 import * as util from 'util';
 
 import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue } from './types';
@@ -216,7 +217,7 @@ class ServerlessSSMPublish {
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
-        Value: typeof param.value === 'string' ? param.value : JSON.stringify(param.value),
+        Value: typeof param.value === 'string' ? param.value : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
       },

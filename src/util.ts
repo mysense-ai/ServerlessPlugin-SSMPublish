@@ -1,5 +1,6 @@
 import { SSM } from 'aws-sdk';
 import chalk from 'chalk';
+import yaml from 'js-yaml';
 
 import { ServerlessInstance, SSMParam, SSMParamWithValue } from './types';
 
@@ -87,7 +88,7 @@ export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SS
     acc.nonExistingParams.push(curr);
     return acc;
   }
-  if (existingParam.Value === (typeof curr.value === 'string' ? curr.value : JSON.stringify(curr.value))) {
+  if (existingParam.Value === (typeof curr.value === 'string' ? curr.value : yaml.safeDump(curr.value))) {
     acc.existingUnchangedParams.push(curr);
     return acc;
   }
