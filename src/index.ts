@@ -222,20 +222,21 @@ class ServerlessSSMPublish {
         Value: typeof param.value === 'string' ? param.value : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
-      },
-        ).promise(),
-      ));
+      }).promise(),
+    ));
     this.logIfDebug(`SSM Put Results:\n${chalk.green(
-      markdownTable([
-        ['Path', 'Secure', 'Version', 'Tier'],
-        ...putResults.map(({ Version, Tier }, i) =>
-          ([
-            toUpdate[i].path,
-            toUpdate[i].secure,
-            Version ? Version : '',
-            Tier ? Tier : '',
-        ]) as string[]),
-      ]),
+      putResults.length > 0
+        ? (markdownTable([
+            ['Path', 'Secure', 'Version', 'Tier'],
+            ...putResults.map(({ Version, Tier }, i) =>
+              ([
+                toUpdate[i].path,
+                toUpdate[i].secure,
+                Version ? Version : '',
+                Tier ? Tier : '',
+              ]) as string[]),
+          ]))
+        : 'No updates performed.',
     )}`);
   }
 
