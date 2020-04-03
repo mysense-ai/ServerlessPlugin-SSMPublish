@@ -267,7 +267,7 @@ class ServerlessSSMPublish {
   }
 
   private summary() {
-    this.log(chalk.bold.green.underline(`
+    this.log(chalk.bold.green(`
     SSM Publish Summary
       Created: ${this.nonExistingParams.length}
       Updated: ${this.existingChangedParams.length}
