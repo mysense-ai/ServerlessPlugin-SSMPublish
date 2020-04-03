@@ -99,7 +99,7 @@ export const compareParams = (localParams: SSMParamWithValue[], remoteParams: SS
   } else {
     // Can't rely on serialized YAML string to be the same as the original definition.
     // We therefore parse it & do quick-n-dirty deep object comparison via JSON.stringify
-    const parsedExisting = yaml.safeLoad(existingParam.Value);
+    const parsedExisting = yaml.safeLoad(existingParam.Value ? existingParam.Value : '');
     if (JSON.stringify(parsedExisting) === JSON.stringify(curr.value)) {
       acc.existingUnchangedParams.push(curr);
       return acc;
