@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.0...v1.2.1) (2020-04-03)
+
+
+### Bug Fixes
+
+* improve messaging when no SSM updates are performed ([0bb5a6b](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/0bb5a6bfa52b064c4bcf75fe5be4ae78c736bef9))
+* remove spacing that causes table to be misaligned ([764cfbf](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/764cfbfddf0f3821a0dbb1e1a2f62a7c5b8ad24f))
+
 # [1.2.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.5...v1.2.0) (2020-04-03)
 
 
