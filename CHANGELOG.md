@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.5...v1.2.0) (2020-04-03)
+
+
+### Bug Fixes
+
+* failing unit test due to typing issue ([73318e2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/73318e279356686d1ef2e57cfc2cefaf4fcf9c24))
+
+
+### Features
+
+* add npm packages ([278b6b3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/278b6b35feabdb16d8a5ab0ebd22401db1c34809))
+* display SSM Put & SSM Publish results in markdown table ([2a2b48e](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/2a2b48e12aa372edadfd46265417c39a3b0ab221))
+
 ## [1.1.5](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.1.4...v1.1.5) (2020-04-02)
 
 
