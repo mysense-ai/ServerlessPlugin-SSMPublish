@@ -225,7 +225,7 @@ class ServerlessSSMPublish {
       },
         ).promise(),
       ));
-    this.logIfDebug(`SSM Put Results:\n ${chalk.green(
+    this.logIfDebug(`SSM Put Results:\n${chalk.green(
       markdownTable([
         ['Path', 'Secure', 'Version', 'Tier'],
         ...putResults.map(({ Version, Tier }, i) =>
@@ -281,7 +281,7 @@ class ServerlessSSMPublish {
   }
 
   private summary() {
-    this.log(`SSM Publish Summary:\n ${chalk.bold.green(
+    this.log(`SSM Publish Summary:\n${chalk.bold.green(
       markdownTable([
         [
           `Created (${this.nonExistingParams.length})`,
