@@ -1,6 +1,7 @@
 import { CloudFormation, SSM } from 'aws-sdk';
 import chalk from 'chalk';
 import yaml from 'js-yaml';
+import markdownTable from 'markdown-table';
 import * as util from 'util';
 
 import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue } from './types';
@@ -213,7 +214,8 @@ class ServerlessSSMPublish {
    * Makes putParameter request for all changed/new parameters
    */
   private async updateParams() {
-    const putResults = await Promise.all([...this.nonExistingParams, ...this.existingChangedParams].map(async (param: SSMParamWithValue) => this.ssm.putParameter(
+    const toUpdate = [...this.nonExistingParams, ...this.existingChangedParams];
+    const putResults = await Promise.all(toUpdate.map(async (param: SSMParamWithValue) => this.ssm.putParameter(
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
@@ -223,8 +225,20 @@ class ServerlessSSMPublish {
       },
         ).promise(),
       ));
-    this.logIfDebug(`SSM Put Results:\n\t${putResults.join('\n\t')}`);
-}
+    this.logIfDebug(`SSM Put Results:\n ${chalk.green(
+      markdownTable([
+        ['Path', 'Secure', 'Version', 'Tier'],
+        ...putResults.map(({ Version, Tier }, i) =>
+          ([
+            toUpdate[i].path,
+            toUpdate[i].secure,
+            Version ? Version : '',
+            Tier ? Tier : '',
+        ]) as string[]),
+      ]),
+    )}`);
+  }
+
   private async retrieveAndFormatCloudFormationOutput(): Promise<SSMParamWithValue[]> {
     const stackResult = await this.fetchCFOutput();
     return ServerlessSSMPublish.prettifyCFOutput(stackResult);
@@ -267,12 +281,18 @@ class ServerlessSSMPublish {
   }
 
   private summary() {
-    this.log(chalk.bold.green(`
-    SSM Publish Summary
-      Created: ${this.nonExistingParams.length}
-      Updated: ${this.existingChangedParams.length}
-      Unchanged: ${this.existingUnchangedParams.length}
-    `));
+    this.log(`SSM Publish Summary:\n ${chalk.bold.green(
+      markdownTable([
+        [
+          `Created (${this.nonExistingParams.length})`,
+          `Updated (${this.existingChangedParams.length})`,
+          `Unchanged (${this.existingUnchangedParams.length})`,
+        ],
+        ...this.nonExistingParams.map((p) => ([p.path, '', ''])),
+        ...this.existingChangedParams.map((p) => (['', p.path, ''])),
+        ...this.existingUnchangedParams.map((p) => (['', '', p.path])),
+      ]),
+    )}`);
   }
 }
 
