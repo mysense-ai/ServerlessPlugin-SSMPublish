@@ -222,20 +222,21 @@ class ServerlessSSMPublish {
         Value: typeof param.value === 'string' ? param.value : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.secure ? 'SecureString' : 'String',
-      },
-        ).promise(),
-      ));
-    this.logIfDebug(`SSM Put Results:\n ${chalk.green(
-      markdownTable([
-        ['Path', 'Secure', 'Version', 'Tier'],
-        ...putResults.map(({ Version, Tier }, i) =>
-          ([
-            toUpdate[i].path,
-            toUpdate[i].secure,
-            Version ? Version : '',
-            Tier ? Tier : '',
-        ]) as string[]),
-      ]),
+      }).promise(),
+    ));
+    this.logIfDebug(`SSM Put Results:\n${chalk.green(
+      putResults.length > 0
+        ? (markdownTable([
+            ['Path', 'Secure', 'Version', 'Tier'],
+            ...putResults.map(({ Version, Tier }, i) =>
+              ([
+                toUpdate[i].path,
+                toUpdate[i].secure,
+                Version ? Version : '',
+                Tier ? Tier : '',
+              ]) as string[]),
+          ]))
+        : 'No updates performed.',
     )}`);
   }
 
@@ -281,7 +282,7 @@ class ServerlessSSMPublish {
   }
 
   private summary() {
-    this.log(`SSM Publish Summary:\n ${chalk.bold.green(
+    this.log(`SSM Publish Summary:\n${chalk.bold.green(
       markdownTable([
         [
           `Created (${this.nonExistingParams.length})`,
