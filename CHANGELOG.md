@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.1...v1.2.2) (2020-04-21)
+
+
+### Bug Fixes
+
+* update packages for vulns ([95254cc](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/95254cc8ab182a250babd4d78d4f2808ecb1b86a))
+
 ## [1.2.1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.0...v1.2.1) (2020-04-03)
 
 
