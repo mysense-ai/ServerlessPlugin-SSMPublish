@@ -57,6 +57,7 @@ custom:
         value: ${self:custom.secretToken}
         description: Super Secret Token          # description is optional
         secure: true                             # defaults to true
+        enabeld: false                           # defaults to true, allows granular control over publishing params
 
       # `value` can be an object; it is serialized to YAML before upload to SSM
       - path: /global/tokens/secretToken
