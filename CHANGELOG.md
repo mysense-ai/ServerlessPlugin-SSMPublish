@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.2...v1.3.0) (2020-07-22)
+
+
+### Bug Fixes
+
+* log statement ([c2e7a71](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/c2e7a71421283ab5234480eae347139668c1114e))
+
+
+### Features
+
+* add enabled/disabled control on each param ([61b30f7](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/61b30f76f09e86e33d44526a2d9152bf87f8bcb4))
+
 ## [1.2.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.1...v1.2.2) (2020-04-21)
 
 
