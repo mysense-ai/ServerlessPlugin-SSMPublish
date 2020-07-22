@@ -75,7 +75,7 @@ export const validateParams = (params: ServerlessInstance['service']['custom']['
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
       if (param.secure && typeof param.secure !== 'boolean') { // tslint:disable-line:strict-type-predicates
-        logFunction(chalk.redBright(`Param at path ${param.path} should pass enabled as boolean value`));
+        logFunction(chalk.redBright(`Param at path ${param.path} should pass "secure" as boolean value`));
       }
       if (paramKeys.includes('enabled') && param.enabled === false) return undefined;
 
