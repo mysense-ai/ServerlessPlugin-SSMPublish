@@ -52,6 +52,7 @@ export interface BaseSSMParam {
   path: string;
   description?: string;
   secure?: boolean;
+  enabled?: boolean;
 }
 export interface SSMParamCloudFormation extends BaseSSMParam {
   source: string;

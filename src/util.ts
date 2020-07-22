@@ -43,13 +43,16 @@ export const evaluateEnabled = (serviceCustomBlock: ServerlessInstance['service'
  * Validates params passed in serverless.yaml
  * Throws error if no params or incorrect syntax.
  */
+
+const isParam = (param: SSMParam | undefined): param is SSMParam => !!param;
+
 export const validateParams = (params: ServerlessInstance['service']['custom']['ssmPublish']['params'], throwFunction: (message) => void, logFunction: (message) => void): SSMParam[] => {
     if (!params || !params.length) {
       throwFunction('No params defined');
       throw new Error('only here for typescript'); // typescript doesn't recognise that throwFunction above throws
     }
 
-    const validateParam = (param: SSMParamWithValue) => {
+    const validateParam = (param: SSMParamWithValue): SSMParam | undefined => {
       const maxNameLength = 1011; // needs to account for ARN stuff being added
       const maxDescriptionLength = 1024;
       const maxDepth = 15;
@@ -71,11 +74,15 @@ export const validateParams = (params: ServerlessInstance['service']['custom']['
         throwFunction(`Param ${param.path} name doesn't match AWS constraints`);
       if (param.description && param.description.length > maxDescriptionLength)
         throwFunction(`Param ${param.path} description is too long`);
+      if (param.secure && typeof param.secure !== 'boolean') { // tslint:disable-line:strict-type-predicates
+        logFunction(chalk.redBright(`Param at path ${param.path} should pass "secure" as boolean value`));
+      }
+      if (paramKeys.includes('enabled') && param.enabled === false) return undefined;
 
       return { ...param, secure: param.secure !== false };
     };
 
-    return params.map(validateParam);
+    return params.map(validateParam).filter(isParam);
   };
 
 /**
