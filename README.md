@@ -43,9 +43,6 @@ custom:
   secretToken: ${opt:secretToken}
   vpc:
     securityGroupIds: ['sg-nnnnnnnnnnnnn','sg-mmmmmmmmmm']
-  tags:
-    - Key: version
-      Value: v1.0.2
 
   someConfiguration:
     foo: bar
@@ -78,7 +75,6 @@ custom:
         value: ${self:custom.vpc.securityGroupIds}
         description: System VPC Security Group Ids
         type: StringList
-        tags: ${self:custom.tags}
 ```
 
 ### From the CLI

@@ -220,14 +220,14 @@ class ServerlessSSMPublish {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
         Value: typeof param.value === 'string' ? param.value : yaml.safeDump(param.value),
-        Type: param.type ? param.type :  param.secure ? 'SecureString' : 'String',
-        Tags: param.tags,
+        Overwrite: true,
+        Type: param.type ? param.type : param.secure ? 'SecureString' : 'String',
       }).promise(),
     ));
     this.logIfDebug(`SSM Put Results:\n${chalk.green(
       putResults.length > 0
         ? (markdownTable([
-            ['Path', 'Secure', 'Version', 'Tier', 'Type', 'Tags'],
+            ['Path', 'Secure', 'Version', 'Tier', 'Type'],
             ...putResults.map(({ Version, Tier }, i) =>
               ([
                 toUpdate[i].path,
@@ -235,7 +235,6 @@ class ServerlessSSMPublish {
                 Version ? Version : '',
                 Tier ? Tier : '',
                 toUpdate[i].type,
-                toUpdate[i].tags,
               ]) as string[]),
           ]))
         : 'No updates performed.',
