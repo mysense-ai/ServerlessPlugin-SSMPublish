@@ -85,13 +85,26 @@ describe('validateParams should correctly validate user input', () => {
     test('It should return valid input as expected (default secure to true)', () => {
     const mockData = [
       { path: '/test/param', value: 'test'},
-      { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
+      {
+        path: '/test/param1', value: 'test', secure: false, description: 'valid',
+        tags: [{
+          Key: 'STRING_VALUE',
+          Value: 'STRING_VALUE',
+        },
+        ],
+      },
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
     ];
 
     const expectedResult = [
       { path: '/test/param', value: 'test', secure: true},
-      { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
+      {
+        path: '/test/param1', value: 'test', secure: false, description: 'valid', tags: [
+          {
+            Key: 'STRING_VALUE',
+            Value: 'STRING_VALUE',
+          }],
+      },
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
     ];
     expect(validateParams(mockData, throwFunction, logFunction)).toStrictEqual(expectedResult);

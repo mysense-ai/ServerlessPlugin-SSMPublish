@@ -53,6 +53,8 @@ export interface BaseSSMParam {
   description?: string;
   secure?: boolean;
   enabled?: boolean;
+  type?: 'String' | 'StringList' | 'SecureString';
+  tags?: TagList;
 }
 export interface SSMParamCloudFormation extends BaseSSMParam {
   source: string;
@@ -85,3 +87,17 @@ export interface ServerlessInstance {
   classes: Classes;
   getProvider(name: string): AwsProvider;
 }
+
+export interface Tag {
+  /**
+   * The name of the tag.
+   */
+  Key: TagKey;
+  /**
+   * The value of the tag.
+   */
+  Value: TagValue;
+}
+export type TagKey = string;
+export type TagList = Tag[];
+export type TagValue = string;
