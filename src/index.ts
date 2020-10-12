@@ -219,7 +219,11 @@ class ServerlessSSMPublish {
       {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
-        Value: typeof param.value === 'string' ? param.type !== 'StringList' ? param.value : yaml.safeDump(param.value) : new Array(param.value).join(','),
+        Value: typeof param.value === 'string'
+            ? param.value
+            : param.type === 'StringList' && Array.isArray(param.value) && param.value.every((item) => typeof item === 'string')
+              ? param.value.join(',')
+              : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.type ? param.type : param.secure ? 'SecureString' : 'String',
       }).promise(),
