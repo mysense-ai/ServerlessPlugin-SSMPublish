@@ -53,7 +53,18 @@ export interface BaseSSMParam {
   description?: string;
   secure?: boolean;
   enabled?: boolean;
-  type?: 'String' | 'StringList' | 'SecureString' | string;
+export enum SSMParamTypes {
+  STRING = 'String',
+  SECURESTRING = 'SecureString',
+  STRINGLIST = 'StringList',
+}
+export interface BaseSSMParam {
+  path: string;
+  description?: string;
+  secure?: boolean;
+  enabled?: boolean;
+  type?: SSMParamTypes;
+}
 }
 export interface SSMParamCloudFormation extends BaseSSMParam {
   source: string;
