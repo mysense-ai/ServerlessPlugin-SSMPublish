@@ -48,16 +48,12 @@ interface SSMPublish {
   publishCloudFormationExports?: boolean;
 }
 
-export interface BaseSSMParam {
-  path: string;
-  description?: string;
-  secure?: boolean;
-  enabled?: boolean;
 export enum SSMParamTypes {
   STRING = 'String',
   SECURESTRING = 'SecureString',
   STRINGLIST = 'StringList',
 }
+
 export interface BaseSSMParam {
   path: string;
   description?: string;
@@ -65,7 +61,7 @@ export interface BaseSSMParam {
   enabled?: boolean;
   type?: SSMParamTypes;
 }
-}
+
 export interface SSMParamCloudFormation extends BaseSSMParam {
   source: string;
 }
