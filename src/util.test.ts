@@ -87,7 +87,7 @@ describe('validateParams should correctly validate user input', () => {
       { path: '/test/param', value: 'test'},
       { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
-      { path: 'test/param3', value: 'test,test2', secure: true , type: 'StringList', description: 'valid'},
+      { path: 'test/param3', value: 'test,test2', secure: true , type: 'StringList' as SSMParamTypes, description: 'valid'},
     ];
 
     const expectedResult = [
