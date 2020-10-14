@@ -1,3 +1,17 @@
+# [1.4.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.3.0...v1.4.0) (2020-10-14)
+
+
+### Bug Fixes
+
+* remove package lock ([a551fbc](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/a551fbc4ad6aa738125e52cf81b8dfdcda7dbbd3))
+* revert tags ([ed112f6](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/ed112f6bf9e35b9b2e0bbb637874c192e210d87a))
+* store string list as comma separated array ([dad012d](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/dad012d77ee13a7e3368541f6e5dae55843c571a))
+
+
+### Features
+
+* add support for string list and tags ([9674a5d](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/9674a5d275ebd24166b6e95cbbfa9b2758087a94))
+
 # [1.3.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.2.2...v1.3.0) (2020-07-22)
 
 
