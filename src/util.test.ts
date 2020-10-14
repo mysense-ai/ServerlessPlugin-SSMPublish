@@ -1,4 +1,4 @@
-import { ServerlessInstance } from './types';
+import { ServerlessInstance, SSMParamTypes } from './types';
 import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const throwFunction = (message: string): void => { throw new Error(message); };
@@ -87,12 +87,14 @@ describe('validateParams should correctly validate user input', () => {
       { path: '/test/param', value: 'test'},
       { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
+      { path: 'test/param3', value: 'test,test2', secure: true , type: 'StringList' as SSMParamTypes, description: 'valid'},
     ];
 
     const expectedResult = [
       { path: '/test/param', value: 'test', secure: true},
       { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
+      { path: 'test/param3', value: 'test,test2', secure: true, type: 'StringList' as SSMParamTypes, description: 'valid'},
     ];
     expect(validateParams(mockData, throwFunction, logFunction)).toStrictEqual(expectedResult);
   });
@@ -103,6 +105,7 @@ describe('compareParams should correctly compare and sort local and remote param
   test('It should show all local params as nonExisting if no remote params were found', () => {
     const localMockData1 =  [
       { path: '/test/ssmParams/testToken2', value: 'update', description: 'test description', secure: true},
+      { path: '/test/ssmParams/testToken3', value: ['update1', 'update2'], type: 'StringList' as SSMParamTypes, description: 'test description'},
     ];
     expect(compareParams(localMockData1, []).nonExistingParams).toStrictEqual(localMockData1);
   });
@@ -112,6 +115,8 @@ describe('compareParams should correctly compare and sort local and remote param
       { path: '/test/ssmParams/unchangedToken', value: 'update', description: 'test description', secure: true},
       { path: '/test/ssmParams/changedToken', value: 'testtesttest', secure: true},
       { path: '/test/ssmParams/nonExistingToken', value: 'newToken', secure: true},
+      { path: '/test/ssmParams/testToken3', value: ['update1', 'update2'], type: 'StringList' as SSMParamTypes, description: 'test description'},
+
     ];
 
     const remoteMockData = [
@@ -121,13 +126,18 @@ describe('compareParams should correctly compare and sort local and remote param
       Value: 'changed',
       },
       {
+      Name: '/test/ssmParams/testToken3',
+      Type: 'StringList' as SSMParamTypes,
+      Value: 'update',
+      },
+      {
       Name: '/test/ssmParams/unchangedToken',
       Type: 'SecureString',
       Value: 'update',
       },
     ];
     expect(compareParams(localMockData, remoteMockData).existingUnchangedParams).toStrictEqual([localMockData[0]]);
-    expect(compareParams(localMockData, remoteMockData).existingChangedParams).toStrictEqual([localMockData[1]]);
+    expect(compareParams(localMockData, remoteMockData).existingChangedParams).toStrictEqual([localMockData[1], localMockData[3]]); // tslint:disable-line:no-magic-numbers
     expect(compareParams(localMockData, remoteMockData).nonExistingParams).toStrictEqual([localMockData[2]]); // tslint:disable-line:no-magic-numbers
 
     });

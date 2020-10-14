@@ -41,6 +41,8 @@ resources:
 
 custom:
   secretToken: ${opt:secretToken}
+  vpc:
+    securityGroupIds: ['sg-nnnnnnnnnnnnn','sg-mmmmmmmmmm']
 
   someConfiguration:
     foo: bar
@@ -68,6 +70,11 @@ custom:
       - path: /service/config/storageBucket
         source: ExampleStaticValue
         secure: false
+
+      - path: /infrastructure/config/vpc/securityGroupIds
+        value: ${self:custom.vpc.securityGroupIds}
+        description: System VPC Security Group Ids
+        type: StringList
 ```
 
 ### From the CLI
