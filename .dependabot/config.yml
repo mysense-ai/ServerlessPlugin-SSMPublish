@@ -7,8 +7,6 @@ update_configs:
     directory: '/'                                            # Where to look for package manifests (package.json)
     update_schedule: 'monthly'                                # How often to check for updates (live, daily, weekly, monthly)
     target_branch: 'master'                                   # Branch to create pull requests against
-    default_reviewers: ['@mysense-ai/backend']                # Reviewers to set on pull requests
-    default_assignees: ['@mysense-ai/backend']                # Assignees to set on pull requests
     default_labels: ['dependencies', 'dependabot']            # Labels to set on pull requests
     commit_message:                                           # Commit message preferences
       prefix: 'fix'                     # production dependencies will be prefixed with `fix(deps):`
