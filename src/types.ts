@@ -54,12 +54,18 @@ export enum SSMParamTypes {
   STRINGLIST = 'StringList',
 }
 
+export enum SSMTierTypes {
+  STANDARD = 'Standard',
+  ADVANCED = 'Advanced',
+}
+
 export interface BaseSSMParam {
   path: string;
   description?: string;
   secure?: boolean;
   enabled?: boolean;
   type?: SSMParamTypes;
+  tier?: SSMTierTypes;
 }
 
 export interface SSMParamCloudFormation extends BaseSSMParam {

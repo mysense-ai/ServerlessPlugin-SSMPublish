@@ -1,4 +1,4 @@
-import { ServerlessInstance, SSMParamTypes } from './types';
+import { ServerlessInstance, SSMParamTypes, SSMTierTypes } from './types';
 import { compareParams, evaluateEnabled, validateParams } from './util';
 
 const throwFunction = (message: string): void => { throw new Error(message); };
@@ -88,6 +88,8 @@ describe('validateParams should correctly validate user input', () => {
       { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
       { path: 'test/param3', value: 'test,test2', secure: true , type: 'StringList' as SSMParamTypes, description: 'valid'},
+      { path: 'test/param4', value: 'test4', secure: false , type: 'String' as SSMParamTypes, tier: 'Standard' as SSMTierTypes, description: 'valid'},
+      { path: 'test/param5', value: 'test5', secure: false , type: 'String' as SSMParamTypes, tier: 'Advanced' as SSMTierTypes, description: 'valid'},
     ];
 
     const expectedResult = [
@@ -95,6 +97,8 @@ describe('validateParams should correctly validate user input', () => {
       { path: '/test/param1', value: 'test', secure: false, description: 'valid'},
       { path: 'test/param2', value: 'test', secure: true, description: 'valid'},
       { path: 'test/param3', value: 'test,test2', secure: true, type: 'StringList' as SSMParamTypes, description: 'valid'},
+      { path: 'test/param4', value: 'test4', secure: true, type: 'String' as SSMParamTypes, tier: 'Standard' as SSMTierTypes, description: 'valid'},
+      { path: 'test/param5', value: 'test5', secure: true, type: 'String' as SSMParamTypes, tier: 'Advanced' as SSMTierTypes, description: 'valid'},
     ];
     expect(validateParams(mockData, throwFunction, logFunction)).toStrictEqual(expectedResult);
   });
@@ -135,7 +139,13 @@ describe('compareParams should correctly compare and sort local and remote param
       Type: 'SecureString',
       Value: 'update',
       },
-    ];
+      {
+        Name: '/test/ssmParams/changedToken2',
+        Type: 'String',
+        Value: 'changed',
+        Tier: 'Advanced',
+        },
+      ];
     expect(compareParams(localMockData, remoteMockData).existingUnchangedParams).toStrictEqual([localMockData[0]]);
     expect(compareParams(localMockData, remoteMockData).existingChangedParams).toStrictEqual([localMockData[1], localMockData[3]]); // tslint:disable-line:no-magic-numbers
     expect(compareParams(localMockData, remoteMockData).nonExistingParams).toStrictEqual([localMockData[2]]); // tslint:disable-line:no-magic-numbers

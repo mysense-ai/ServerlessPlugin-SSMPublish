@@ -226,6 +226,7 @@ class ServerlessSSMPublish {
               : yaml.safeDump(param.value),
         Overwrite: true,
         Type: param.type ? param.type : param.secure ? 'SecureString' : 'String',
+        Tier: param.tier ? param.tier : param.tier ? 'Advanced' : 'Standard',  // TODO: Add support for 'Intelligent-Tiering'
       }).promise(),
     ));
     this.logIfDebug(`SSM Put Results:\n${chalk.green(

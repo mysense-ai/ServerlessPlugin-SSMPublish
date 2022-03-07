@@ -114,3 +114,5 @@ archives
 
 # Test Coverage
 .coverage
+
+.history/
