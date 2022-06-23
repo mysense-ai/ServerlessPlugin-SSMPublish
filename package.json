@@ -1,4 +1,4 @@
-{
+  {
   "name": "serverless-ssm-publish",
   "version": "1.4.1",
   "description": "Serverless Framework plugin to publish data to AWS SSM Parameter Store",
@@ -10,7 +10,7 @@
   "homepage": "https://github.com/mysense-ai/ServerlessPlugin-SSMPublish#readme",
   "engines": {
     "node": ">=10.0.0",
-    "npm": "6.13.1"
+    "npm": ">=6.13.1"
   },
   "private": false,
   "repository": {
