@@ -22,7 +22,6 @@ jobs:
         - yarn codecov
     - stage: publish
       name: "Build and publish to NPM"
-      node_js: "14"
       script: skip
       before_deploy:
         - echo "Building..."
