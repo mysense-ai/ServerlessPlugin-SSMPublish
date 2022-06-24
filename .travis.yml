@@ -13,7 +13,7 @@ jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script: yarn
+      script: yarn install --frozen-lockfile
     - stage: test
       name: "Unit Tests + Coverage"
       script:
@@ -22,7 +22,7 @@ jobs:
         - yarn codecov
     - stage: publish
       name: "Build and publish to NPM"
-      node_js: 'node'
+      node_js: "14"
       script: skip
       before_deploy:
         - echo "Building..."
