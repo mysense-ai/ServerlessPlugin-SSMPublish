@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.1...v1.4.2) (2022-06-24)
+
+
+### Bug Fixes
+
+* node v14 ([a3ba459](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/a3ba45937be46da26532b796181eaabc90e54214))
+* remove duplicate nodejs ([26b470c](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/26b470c7fc38bf1564a656c8d8c7fccfd8dbe6f6))
+
 ## [1.4.1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.0...v1.4.1) (2020-10-14)
 
 
