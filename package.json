@@ -48,9 +48,9 @@
     "test": "jest",
     "test:build": "jest -c '{}' build",
     "test:coverage": "jest --coverage",
-    "codecov": "scripts/codecov.bash",
+    "codecov": "chmod +x scripts/codecov.bash && scripts/codecov.bash",
     "semantic-release": "semantic-release",
-    "build": "scripts/build.bash",
+    "build": "chmod +x scripts/build.bash && scripts/build.bash",
     "build:ci": "tsc"
   },
   "dependencies": {
