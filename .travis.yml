@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "14"
+  - "18"
 
 cache: yarn
 
@@ -13,7 +13,7 @@ jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script: yarn install --frozen-lockfile
+      script: yarn install --immutable --immutable-cache --check-cache
     - stage: test
       name: "Unit Tests + Coverage"
       script:
@@ -30,8 +30,7 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true # will be deprecated in dpl2
-        script:
-          - yarn semantic-release
+        script: yarn semantic-release
         on:
           branch: master
 
