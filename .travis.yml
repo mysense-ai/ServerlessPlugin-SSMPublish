@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "18"
+  - "16"
 
 cache: yarn
 
@@ -13,10 +13,7 @@ jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script:
-        # This is required by Node 18
-        - sudo apt install libc6
-        - yarn install --immutable --immutable-cache --check-cache
+      script: yarn install --immutable --immutable-cache --check-cache
     - stage: test
       name: "Unit Tests + Coverage"
       script:
