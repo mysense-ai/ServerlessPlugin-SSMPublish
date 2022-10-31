@@ -1,11 +1,13 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  'verbose': true,
-  'transform': { '.(ts|tsx)': '<rootDir>/node_modules/ts-jest/preprocessor.js' },
-  'testMatch': ['**/*.test.ts'],
-  'moduleFileExtensions': [ 'ts', 'tsx', 'js' ],
-  'coverageDirectory': '.coverage',
-  "collectCoverageFrom": ["src/**/*.{js,ts,tsx}"],
-  'testPathIgnorePatterns': [
+  testEnvironment: 'node',
+  verbose: true,
+  preset: 'ts-jest',
+  testMatch: ['**/*.test.ts'],
+  moduleFileExtensions: [ 'ts', 'tsx', 'js' ],
+  coverageDirectory: '.coverage',
+  collectCoverageFrom: ['src/**/*.{js,ts,tsx}'],
+  testPathIgnorePatterns: [
     '/node_modules/',
     // '/build/', // Travis places our build in a build folder which results in jest ignoring our tests
     'd.ts'
