@@ -13,7 +13,10 @@ jobs:
   include:
     - stage: install
       name: "Install Dependencies"
-      script: yarn install --immutable --immutable-cache --check-cache
+      script:
+        # This is required by Node 18
+        - sudo apt install libc6
+        - yarn install --immutable --immutable-cache --check-cache
     - stage: test
       name: "Unit Tests + Coverage"
       script:
