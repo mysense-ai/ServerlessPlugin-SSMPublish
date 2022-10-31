@@ -1,7 +1,7 @@
 import { CloudFormation, SSM } from 'aws-sdk';
 import chalk from 'chalk';
 import yaml from 'js-yaml';
-import markdownTable from 'markdown-table';
+import { markdownTable } from 'markdown-table';
 import * as util from 'util';
 
 import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue } from './types';
@@ -47,10 +47,10 @@ class ServerlessSSMPublish {
     const formattedParams = stackOutput
       // ensure output matches our formatting
       .map((output) => ({
-      path: output.OutputKey || '',
-      value: output.OutputValue || '',
-      description: output.Description,
-    }));
+        path: output.OutputKey || '',
+        value: output.OutputValue || '',
+        description: output.Description,
+      }));
 
     return formattedParams || [];
   }
@@ -78,7 +78,7 @@ class ServerlessSSMPublish {
 
     this.hooks = {
       // Pre & post hooks
-      'after:ssmPublish:upsertParams':  this.hookWrapper.bind(this, this.summary.bind(this)),          // tslint:disable-line:no-unsafe-any
+      'after:ssmPublish:upsertParams': this.hookWrapper.bind(this, this.summary.bind(this)),          // tslint:disable-line:no-unsafe-any
 
       // Actual lifecycle event handling
       'ssmPublish:checkIfParamsExist': this.hookWrapper.bind(this, this.getAndCheckParams.bind(this)), // tslint:disable-line:no-unsafe-any
@@ -152,7 +152,11 @@ class ServerlessSSMPublish {
             this.throwError(`No Cloud Formation Output found for source ${slsParam.source}`);
             throw new Error(`No Cloud Formation Output found for source ${slsParam.source}`); // Throwing again as typescript won't recognise throwError as throwing
           }
-          return { ...slsParam, value: foundCloudFormationParam.value, description: foundCloudFormationParam.description || slsParam.description };
+          return {
+            ...slsParam,
+            value: foundCloudFormationParam.value,
+            description: foundCloudFormationParam.description || slsParam.description,
+          };
         });
 
         // Put params on this for following logic
@@ -187,7 +191,10 @@ class ServerlessSSMPublish {
       return arrayChunks;
     });
 
-    const getParameters = async (params: SSMParam[]) => this.ssm.getParameters({ Names: params.map((param) => param.path), WithDecryption: true}).promise();
+    const getParameters = async (params: SSMParam[]) => this.ssm.getParameters({
+      Names: params.map((param) => param.path),
+      WithDecryption: true,
+    }).promise();
 
     const paramsToCheck = chunkArray(this.params, 10); // tslint:disable-line:no-magic-numbers
 
@@ -208,7 +215,7 @@ class ServerlessSSMPublish {
     this.existingChangedParams = existingChangedParams;
     this.existingUnchangedParams = existingUnchangedParams;
 
-}
+  }
 
   /**
    * Makes putParameter request for all changed/new parameters
@@ -220,10 +227,10 @@ class ServerlessSSMPublish {
         Name: param.path,
         Description: param.description || `Placed by ${this.serverless.service.getServiceName()} - serverless-ssm-plugin`,
         Value: typeof param.value === 'string'
-            ? param.value
-            : param.type === 'StringList' && Array.isArray(param.value) && param.value.every((item) => typeof item === 'string')
-              ? param.value.join(',')
-              : yaml.safeDump(param.value),
+          ? param.value
+          : param.type === 'StringList' && Array.isArray(param.value) && param.value.every((item) => typeof item === 'string')
+            ? param.value.join(',')
+            : yaml.dump(param.value),
         Overwrite: true,
         Type: param.type ? param.type : param.secure ? 'SecureString' : 'String',
       }).promise(),
@@ -231,16 +238,16 @@ class ServerlessSSMPublish {
     this.logIfDebug(`SSM Put Results:\n${chalk.green(
       putResults.length > 0
         ? (markdownTable([
-            ['Path', 'Secure', 'Version', 'Tier', 'Type'],
-            ...putResults.map(({ Version, Tier }, i) =>
-              ([
-                toUpdate[i].path,
-                toUpdate[i].secure,
-                Version ? Version : '',
-                Tier ? Tier : '',
-                toUpdate[i].type,
-              ]) as string[]),
-          ]))
+          ['Path', 'Secure', 'Version', 'Tier', 'Type'],
+          ...putResults.map(({ Version, Tier }, i) =>
+            ([
+              toUpdate[i].path,
+              toUpdate[i].secure,
+              Version ? Version : '',
+              Tier ? Tier : '',
+              toUpdate[i].type,
+            ]) as string[]),
+        ]))
         : 'No updates performed.',
     )}`);
   }
@@ -266,7 +273,7 @@ class ServerlessSSMPublish {
    */
   private log(message: string): void {
     this.serverless.cli.log(`[serverless-ssm-publish]: ${message}`);
-}
+  }
 
   /**
    * Logs message with prefix if SLS_DEBUG is set
