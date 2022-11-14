@@ -1,6 +1,6 @@
 {
   "name": "@joindeed/serverless-ssm-publish",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Serverless Framework plugin to publish data to AWS SSM Parameter Store",
   "author": "MySense",
   "license": "MIT",
