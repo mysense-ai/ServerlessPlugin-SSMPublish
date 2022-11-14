@@ -46,7 +46,7 @@
     "test:coverage": "jest --coverage",
     "codecov": "codecov",
     "semantic-release": "semantic-release",
-    "build": "scripts/build.bash",
+    "build": "tsc",
     "build:ci": "tsc"
   },
   "dependencies": {
