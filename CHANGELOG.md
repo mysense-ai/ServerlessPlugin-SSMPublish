@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.2...v1.4.3) (2022-12-01)
+
+
+### Bug Fixes
+
+* empty commit to force a package build ([da35fb3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/da35fb314b71f2aa223078048bc448c3331f4f1a))
+
 ## [1.4.2](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.1...v1.4.2) (2022-06-24)
 
 
