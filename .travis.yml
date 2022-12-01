@@ -1,7 +1,9 @@
 language: node_js
 
 node_js:
-  - "14"
+  - 14
+  - 15
+  - 16
 
 cache: yarn
 
@@ -30,8 +32,7 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true # will be deprecated in dpl2
-        script:
-          - yarn semantic-release
+        script: yarn semantic-release
         on:
           branch: master
 
