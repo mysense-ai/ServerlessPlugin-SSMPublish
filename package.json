@@ -1,13 +1,13 @@
 {
-  "name": "@joindeed/serverless-ssm-publish",
+  "name": "serverless-ssm-publish",
   "version": "1.4.3",
   "description": "Serverless Framework plugin to publish data to AWS SSM Parameter Store",
   "author": "MySense",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joindeed/ServerlessPlugin-SSMPublish/issues"
+    "url": "https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/issues"
   },
-  "homepage": "https://github.com/joindeed/ServerlessPlugin-SSMPublish#readme",
+  "homepage": "https://github.com/mysense-ai/ServerlessPlugin-SSMPublish#readme",
   "engines": {
     "node": ">=14.0.0 <=16.18.1",
     "npm": ">=6.14.8 <=8.19.2"
@@ -15,7 +15,11 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/joindeed/ServerlessPlugin-SSMPublish.git"
+    "url": "https://github.com/mysense-ai/ServerlessPlugin-SSMPublish"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "keywords": [
     "serverless",
@@ -46,7 +50,7 @@
     "test:coverage": "jest --coverage",
     "codecov": "codecov",
     "semantic-release": "semantic-release",
-    "build": "tsc",
+    "build": "scripts/build.bash",
     "build:ci": "tsc"
   },
   "dependencies": {
