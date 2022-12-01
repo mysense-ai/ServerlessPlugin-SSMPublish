@@ -1,3 +1,17 @@
+# [1.5.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.3...v1.5.0) (2022-12-01)
+
+
+### Bug Fixes
+
+* code coverage scripts ([832b671](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/832b671f84485a9ece7755545523c7a53579bd7f))
+* rename codecov file ([89a8919](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/89a8919790c388194e7b3ebdc0d6152fe721399d))
+* scripts to be executable ([64457bb](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/64457bb65b73039c5f36070b9b359128e2b324aa))
+
+
+### Features
+
+* travis node versions ([87f13de](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/87f13ded7f8d0d2e5fc716682c2b83c5966f80f7))
+
 ## [1.4.3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.2...v1.4.3) (2022-12-01)
 
 
