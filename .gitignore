@@ -114,3 +114,6 @@ archives
 
 # Test Coverage
 .coverage
+
+# code Coverage
+codecov
