@@ -1,0 +1,64 @@
+name: SSMPublish Workflow
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tests:
+    name: Tests and Coverage
+    strategy:
+      matrix:
+        version: [14.19.3, 16, 18, 19]
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.version }}
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Tests and coverage
+        run: |
+          yarn test:coverage
+          echo "Report Coverage..."
+          yarn codecov
+
+  publish:
+    name: Pubish Package
+    runs-on: ubuntu-20.04
+    needs: tests
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN_ADMIN_USER }}
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Build and publish to NPM
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_ADMIN_USER }}
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN_ADMIN_USER }}
+        run: |
+          echo "Building..."
+          yarn build:ci
+
+          echo "Deploying..."
+          yarn semantic-release
