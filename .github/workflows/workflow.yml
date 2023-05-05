@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN_ADMIN_USER }}
+
 jobs:
   tests:
     name: Tests and Coverage
@@ -27,6 +31,7 @@ jobs:
         with:
           node-version: ${{ matrix.version }}
           registry-url: 'https://npm.pkg.github.com'
+          cache: 'yarn'
 
       - name: Install packages
         run: yarn install --frozen-lockfile
@@ -53,9 +58,6 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build and publish to NPM
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_ADMIN_USER }}
-          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN_ADMIN_USER }}
         run: |
           echo "Building..."
           yarn build:ci
