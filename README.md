@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dt/serverless-ssm-publish.svg?style=flat&logo=npm)](https://www.npmjs.com/package/serverless-ssm-publish)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/mysense-ai/ServerlessPlugin-SSMPublish/master/LICENSE)
 [![Coverage Status](https://codecov.io/gh/mysense-ai/ServerlessPlugin-SSMPublish/branch/master/graph/badge.svg)](https://codecov.io/gh/mysense-ai/ServerlessPlugin-SSMPublish)
-[![Build Status](https://travis-ci.com/mysense-ai/ServerlessPlugin-SSMPublish.svg?branch=master)](https://travis-ci.com/mysense-ai/ServerlessPlugin-SSMPublish)
+[![SSMPublish Workflow](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/actions/workflows/workflow.yml/badge.svg)](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/actions/workflows/workflow.yml)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 Publish custom data to AWS SSM Parameter Store from serverless.yaml or Cloud Formation Output
