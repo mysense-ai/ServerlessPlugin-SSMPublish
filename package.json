@@ -9,8 +9,8 @@
   },
   "homepage": "https://github.com/mysense-ai/ServerlessPlugin-SSMPublish#readme",
   "engines": {
-    "node": ">=14.0.0 <=16.18.1",
-    "npm": ">=6.14.8 <=8.19.2"
+    "node": ">=14.0.0",
+    "npm": ">=6.14.8"
   },
   "private": false,
   "repository": {
