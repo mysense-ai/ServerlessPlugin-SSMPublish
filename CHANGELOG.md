@@ -1,3 +1,18 @@
+# [1.6.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.5.0...v1.6.0) (2023-05-05)
+
+
+### Bug Fixes
+
+* trigger travis build ([bd4bd27](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/bd4bd275c4232ba6e57a1db42fc500f0e8186f6e))
+* trigger travis build ([7898032](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/789803268522ea74c3f9ff3fd9faadac65beca19))
+* update node engine restriction ([8625cf5](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/8625cf532d5c82b21e4767714dcbf23a564bf3c2))
+
+
+### Features
+
+* added github actions ([58a8339](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/58a8339f255cabe37b5c418e82c579ad7ed59a3b))
+* github actions ([ba726f1](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/ba726f1033e1ab21fba5603c5683111e3ba7eb61))
+
 # [1.5.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.4.3...v1.5.0) (2022-12-01)
 
 
