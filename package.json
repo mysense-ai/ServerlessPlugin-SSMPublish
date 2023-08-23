@@ -58,7 +58,7 @@
     "js-yaml": "^3.14.0",
     "markdown-table": "^2.0.0",
     "prompt": "^1.0.0",
-    "serverless": "^2.7.0"
+    "serverless": "^3.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
