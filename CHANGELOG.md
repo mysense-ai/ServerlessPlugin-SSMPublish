@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.6.0...v1.7.0) (2023-08-23)
+
+
+### Features
+
+* serverless upgrade ([40c1d48](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/40c1d48244b375e616b3615e60daac88133b0c14))
+
 # [1.6.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.5.0...v1.6.0) (2023-05-05)
 
 
