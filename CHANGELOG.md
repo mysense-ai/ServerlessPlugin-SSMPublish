@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.7.0...v2.0.0) (2025-05-21)
+
+
+### chore
+
+* trigger a release ([d3cdc37](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/d3cdc37cfac0eaa2c4eb4f77dc7e156a766f11e5))
+
+
+### BREAKING CHANGES
+
+* Removes legacy node versions
+
 # [1.7.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.6.0...v1.7.0) (2023-08-23)
 
 
