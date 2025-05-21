@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v2.0.0...v2.1.0) (2025-05-21)
+
+
+### Features
+
+* use stack name if provided ([f6afa84](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/f6afa845b73721312eff2b6e64b4d9c8a95547b8))
+
 # [2.0.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v1.7.0...v2.0.0) (2025-05-21)
 
 
