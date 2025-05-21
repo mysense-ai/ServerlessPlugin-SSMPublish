@@ -26,7 +26,7 @@ interface Provider {
   region: string;
   name: string;
   stage: string;
-  stackName?:string;
+  stackName?: string;
 }
 
 interface Service {
