@@ -120,7 +120,8 @@ class ServerlessSSMPublish {
         // Extract plugin variables
         this.region = this.serverless.service.provider.region;
 
-        this.stackName = util.format('%s-%s',
+          this.stackName = this.serverless.service.provider.stackName ?? util.format('%s-%s',
+      
           this.serverless.service.getServiceName(),
           this.serverless.getProvider('aws').getStage(),
         );
