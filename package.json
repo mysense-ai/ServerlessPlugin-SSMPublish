@@ -74,10 +74,7 @@
     "aws-sdk": "^2.771.0",
     "aws-sdk-mock": "^5.1.0",
     "codecov": "^3.8.0",
-    "commitizen": "^4.2.1",
     "cross-env": "7.0.2",
-    "cz-conventional-changelog": "^3.3.0",
-    "husky": "^4.3.0",
     "jest": "^26.5.3",
     "jest-environment-node": "^26.5.2",
     "lint-staged": "^10.4.0",
@@ -89,22 +86,5 @@
   },
   "jest": {
     "testEnvironment": "node"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "yarn test"
-    }
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "yarn lint"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }
