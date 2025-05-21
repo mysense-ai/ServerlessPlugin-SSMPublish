@@ -1,7 +1,7 @@
 import { CloudFormation, SSM } from 'aws-sdk';
 import chalk from 'chalk';
 import yaml from 'js-yaml';
-import { markdownTable } from 'markdown-table';
+import markdownTable from 'markdown-table';
 import * as util from 'util';
 
 import { ServerlessInstance, SSMParam, SSMParamCloudFormation, SSMParamWithValue } from './types';
