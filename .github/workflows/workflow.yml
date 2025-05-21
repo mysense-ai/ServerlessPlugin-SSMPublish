@@ -38,20 +38,42 @@ jobs:
         with:
           node-version: ${{ matrix.version }}
           registry-url: 'https://npm.pkg.github.com'
-          cache: 'yarn'
-
       - name: Install packages
         run: yarn install --frozen-lockfile
       - name: Tests
         run: |
           yarn lint
           yarn test
-          
+  publish:
+    needs:
+      - tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acquire Github Commit Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.GH_APP_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+          owner: mysense-ai
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Setup Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Build and publish to NPM
         if: github.ref == 'refs/heads/master'
         run: |
+          yarn install --frozen-lockfile
           echo "Building..."
           yarn build:ci
-
           echo "Deploying..."
           yarn semantic-release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          NODE_AUTH_TOKEN: $NPM_TOKEN 
