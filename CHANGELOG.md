@@ -1,3 +1,11 @@
+# [2.2.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v2.1.0...v2.2.0) (2025-05-21)
+
+
+### Features
+
+* downgrade markdown table ([eb534a3](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/eb534a3ee33886c3d372f798da70d6d6e00fc9c0))
+* downgrade markdown table ([ca9f085](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/commit/ca9f085a2b4b7e6d570ba6cd08905a26f37504d7))
+
 # [2.1.0](https://github.com/mysense-ai/ServerlessPlugin-SSMPublish/compare/v2.0.0...v2.1.0) (2025-05-21)
 
 
