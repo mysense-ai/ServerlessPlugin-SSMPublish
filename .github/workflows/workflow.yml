@@ -16,7 +16,7 @@ jobs:
     name: Tests and Coverage
     strategy:
       matrix:
-        version: [14.19.3, 16, 18, 20, 22]
+        version: [20, 22]
     runs-on: ubuntu-latest
 
     steps:
